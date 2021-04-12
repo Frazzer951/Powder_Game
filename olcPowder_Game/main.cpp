@@ -1,6 +1,8 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
 
+bool DEBUG = false;
+
 enum class powderType { air, sand, water };
 
 class PowderGame : public olc::PixelGameEngine
@@ -96,6 +98,13 @@ public:
     // Clear the screen
     Clear( olc::VERY_DARK_GREY );
 
+    // Draw in brush outline
+    int scale = uBrushScale - 1, x = GetMouseX() / powderSize, y = GetMouseY() / powderSize;
+    for( int i = -scale; i <= scale; i++ )
+      for( int j = -scale; j <= scale; j++ )
+        if( inRangeScreen( i + x, j + y ) && i * i + j * j <= scale * scale )
+          FillRect( { ( i + x ) * powderSize, ( j + y ) * powderSize }, { powderSize, powderSize }, olc::CYAN );
+
     // Draw in powders
     for( int y = 0; y < HEIGHT; y++ )
     {
@@ -120,15 +129,18 @@ public:
     // If Paused display how to unpause on screen
     if( !bSimulate ) DrawString( 0, 0, "Press SPACE to Unpause", olc::WHITE );
 
-    // Debug Info
-    DrawString( 0, 8, "Width: " + std::to_string( WIDTH ) + ", Height: " + std::to_string( HEIGHT ) );
-    DrawString( 0,
-                16,
-                "Raw_Mouse_X: " + std::to_string( GetMouseX() ) + ", Raw_Mouse_Y: " + std::to_string( GetMouseY() ) );
-    DrawString( 0,
-                24,
-                "Mouse_X: " + std::to_string( GetMouseX() / powderSize )
-                    + ", Mouse_Y: " + std::to_string( GetMouseY() / powderSize ) );
+    if( DEBUG )
+    {
+      // Debug Info
+      DrawString( 0, 8, "Width: " + std::to_string( WIDTH ) + ", Height: " + std::to_string( HEIGHT ) );
+      DrawString( 0,
+                  16,
+                  "Raw_Mouse_X: " + std::to_string( GetMouseX() ) + ", Raw_Mouse_Y: " + std::to_string( GetMouseY() ) );
+      DrawString( 0,
+                  24,
+                  "Mouse_X: " + std::to_string( GetMouseX() / powderSize )
+                      + ", Mouse_Y: " + std::to_string( GetMouseY() / powderSize ) );
+    }
 
     // Display Brush Scale
     DrawString( 0, ScreenHeight() - 8, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE );
@@ -145,6 +157,10 @@ public:
   }
 
   bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
+  bool inRangeScreen( int x, int y )
+  {
+    return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() );
+  }
 
   void moveSand( int x, int y )
   {
