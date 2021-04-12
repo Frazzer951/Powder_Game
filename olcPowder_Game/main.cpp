@@ -164,10 +164,15 @@ public:
 
   void moveSand( int x, int y )
   {
+    // If above water, switch places with water
+    if( inRange( x, y + 1 ) && powders[( y + 1 ) * WIDTH + x] == powderType::water )
+    {
+      powders[( y + 1 ) * WIDTH + x] = powderType::sand;
+      powders[y * WIDTH + x]         = powderType::water;
+      return;
+    }
+
     // Check 3 positions and move accordingly
-
-    if( y + 1 >= WIDTH ) return;
-
     if( movePowderDown( x, y, powderType::sand ) ) return;
 
     bool bRand = rand() % 2;
@@ -187,7 +192,6 @@ public:
   {
     // Check 5 positions and move accordingly
     // Similar to sand, but will also move left and right
-    if( y + 1 >= WIDTH ) return;
 
     if( movePowderDown( x, y, powderType::water ) ) return;
 
@@ -220,7 +224,7 @@ public:
 
   bool movePowderLeft( int x, int y, powderType type )
   {
-    if( powders[y * WIDTH + ( x - 1 )] == powderType::air && x - 1 >= 0 )
+    if( inRange( x - 1, y ) && powders[y * WIDTH + ( x - 1 )] == powderType::air )
     {
       powders[y * WIDTH + ( x - 1 )] = type;
       powders[y * WIDTH + x]         = powderType::air;
@@ -230,7 +234,7 @@ public:
   }
   bool movePowderRight( int x, int y, powderType type )
   {
-    if( powders[y * WIDTH + ( x + 1 )] == powderType::air && x + 1 < WIDTH )
+    if( inRange( x + 1, y ) && powders[y * WIDTH + ( x + 1 )] == powderType::air )
     {
       powders[y * WIDTH + ( x + 1 )] = type;
       powders[y * WIDTH + x]         = powderType::air;
@@ -240,7 +244,7 @@ public:
   }
   bool movePowderDown( int x, int y, powderType type )
   {
-    if( powders[( y + 1 ) * WIDTH + x] == powderType::air )
+    if( inRange( x, y + 1 ) && powders[( y + 1 ) * WIDTH + x] == powderType::air )
     {
       powders[( y + 1 ) * WIDTH + x] = type;
       powders[y * WIDTH + x]         = powderType::air;
@@ -250,7 +254,7 @@ public:
   }
   bool movePowderDownLeft( int x, int y, powderType type )
   {
-    if( powders[( y + 1 ) * WIDTH + ( x - 1 )] == powderType::air && x - 1 >= 0 )
+    if( inRange( x - 1, y + 1 ) && powders[( y + 1 ) * WIDTH + ( x - 1 )] == powderType::air )
     {
       powders[( y + 1 ) * WIDTH + ( x - 1 )] = type;
       powders[y * WIDTH + x]                 = powderType::air;
@@ -260,9 +264,9 @@ public:
   }
   bool movePowderDownRight( int x, int y, powderType type )
   {
-    if( powders[( y + 1 ) * WIDTH + ( x + 1 )] == powderType::air && x + 1 < WIDTH )
+    if( inRange( x + 1, y + 1 ) && powders[( y + 1 ) * WIDTH + ( x + 1 )] == powderType::air )
     {
-      powders[( y - 1 ) * WIDTH + ( x + 1 )] = type;
+      powders[( y + 1 ) * WIDTH + ( x + 1 )] = type;
       powders[y * WIDTH + x]                 = powderType::air;
       return true;
     }
