@@ -10,24 +10,27 @@ public:
 
 private:
   std::unique_ptr<powderType[]> powders;
-
-  unsigned int uBrushScale = 1;
-
-  bool bSimulate = false;
-
-  float fTargetFrameTime = 1.0f / 100.0f;    // Virtual FPS of 100fps
-  float fAccumulatedTime = 0.0f;
+  int                           WIDTH;                   // Game World Width
+  int                           HEIGHT;                  // Game World Height
+  int                           powderSize       = 4;    // Size of a single Powder
+  unsigned int                  uBrushScale      = 1;
+  bool                          bSimulate        = false;
+  float                         fTargetFrameTime = 1.0f / 100.0f;    // Virtual FPS of 100fps
+  float                         fAccumulatedTime = 0.0f;
 
 public:
   bool OnUserCreate() override
   {
-    powders = std::make_unique<powderType[]>( ScreenWidth() * ScreenHeight() );
-    for( int y = 0; y < ScreenHeight(); y++ )
+    WIDTH  = ScreenWidth() / powderSize;
+    HEIGHT = ScreenHeight() / powderSize;
+
+    powders = std::make_unique<powderType[]>( WIDTH * HEIGHT );
+    for( int y = 0; y < HEIGHT; y++ )
     {
-      for( int x = 0; x < ScreenWidth(); x++ )
+      for( int x = 0; x < WIDTH; x++ )
       {
-        powders[y * ScreenWidth() + x] = powderType::air;
-        if( x == 100 && y >= 95 && y < 105 ) powders[y * ScreenWidth() + x] = powderType::sand;
+        powders[y * WIDTH + x] = powderType::air;
+        if( x == 100 && y >= 95 && y < 105 ) powders[y * WIDTH + x] = powderType::sand;
       }
     }
 
@@ -39,15 +42,15 @@ public:
     // Take user input
     if( GetMouse( 0 ).bHeld )    // Add sand on left click
     {
-      fillPowderCircle( GetMouseX(), GetMouseY(), powderType::sand, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderType::sand, uBrushScale );
     }
     if( GetMouse( 0 ).bHeld && GetKey( olc::Key::CTRL ).bHeld )    // Add sand on left click
     {
-      fillPowderCircle( GetMouseX(), GetMouseY(), powderType::water, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderType::water, uBrushScale );
     }
     if( GetMouse( 1 ).bHeld )    // Set to air on right click
     {
-      fillPowderCircle( GetMouseX(), GetMouseY(), powderType::air, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderType::air, uBrushScale );
     }
     if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
     if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
@@ -71,11 +74,11 @@ public:
     if( bSimulate )
     {
       // Update powders
-      for( int y = ScreenHeight() - 1; y >= 0; y-- )
+      for( int y = HEIGHT - 1; y >= 0; y-- )
       {
-        for( int x = 0; x < ScreenWidth(); x++ )
+        for( int x = 0; x < WIDTH; x++ )
         {
-          switch( powders[y * ScreenWidth() + x] )
+          switch( powders[y * WIDTH + x] )
           {
             case powderType::air:    // Do nothing
               break;
@@ -94,19 +97,21 @@ public:
     Clear( olc::VERY_DARK_GREY );
 
     // Draw in powders
-    for( int y = 0; y < ScreenHeight(); y++ )
+    for( int y = 0; y < HEIGHT; y++ )
     {
-      for( int x = 0; x < ScreenWidth(); x++ )
+      for( int x = 0; x < WIDTH; x++ )
       {
-        switch( powders[y * ScreenWidth() + x] )
+        switch( powders[y * WIDTH + x] )
         {
           case powderType::air:    // Do nothing
             break;
           case powderType::sand:    // Draw Sand
-            Draw( x, y, olc::Pixel( 194, 178, 128 ) );
+            //Draw( x, y, olc::Pixel( 194, 178, 128 ) );
+            FillRect( { x * powderSize, y * powderSize }, { powderSize, powderSize }, olc::Pixel( 194, 178, 128 ) );
             break;
           case powderType::water:    // Draw Water
-            Draw( x, y, olc::Pixel( 0, 0, 255 ) );
+            //Draw( x, y, olc::Pixel( 0, 0, 255 ) );
+            FillRect( { x * powderSize, y * powderSize }, { powderSize, powderSize }, olc::Pixel( 0, 0, 255 ) );
             break;
         }
       }
@@ -114,6 +119,16 @@ public:
 
     // If Paused display how to unpause on screen
     if( !bSimulate ) DrawString( 0, 0, "Press SPACE to Unpause", olc::WHITE );
+
+    // Debug Info
+    DrawString( 0, 8, "Width: " + std::to_string( WIDTH ) + ", Height: " + std::to_string( HEIGHT ) );
+    DrawString( 0,
+                16,
+                "Raw_Mouse_X: " + std::to_string( GetMouseX() ) + ", Raw_Mouse_Y: " + std::to_string( GetMouseY() ) );
+    DrawString( 0,
+                24,
+                "Mouse_X: " + std::to_string( GetMouseX() / powderSize )
+                    + ", Mouse_Y: " + std::to_string( GetMouseY() / powderSize ) );
 
     // Display Brush Scale
     DrawString( 0, ScreenHeight() - 8, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE );
@@ -126,17 +141,16 @@ public:
     scale--;
     for( int i = -scale; i <= scale; i++ )
       for( int j = -scale; j <= scale; j++ )
-        if( inRange( i + x, j + y ) && i * i + j * j <= scale * scale )
-          powders[( j + y ) * ScreenWidth() + ( i + x )] = type;
+        if( inRange( i + x, j + y ) && i * i + j * j <= scale * scale ) powders[( j + y ) * WIDTH + ( i + x )] = type;
   }
 
-  bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() ); }
+  bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
 
   void moveSand( int x, int y )
   {
     // Check 3 positions and move accordingly
 
-    if( y + 1 >= ScreenWidth() ) return;
+    if( y + 1 >= WIDTH ) return;
 
     if( movePowderDown( x, y, powderType::sand ) ) return;
 
@@ -157,7 +171,7 @@ public:
   {
     // Check 5 positions and move accordingly
     // Similar to sand, but will also move left and right
-    if( y + 1 >= ScreenWidth() ) return;
+    if( y + 1 >= WIDTH ) return;
 
     if( movePowderDown( x, y, powderType::water ) ) return;
 
@@ -190,50 +204,50 @@ public:
 
   bool movePowderLeft( int x, int y, powderType type )
   {
-    if( powders[y * ScreenWidth() + ( x - 1 )] == powderType::air && x - 1 >= 0 )
+    if( powders[y * WIDTH + ( x - 1 )] == powderType::air && x - 1 >= 0 )
     {
-      powders[y * ScreenWidth() + ( x - 1 )] = type;
-      powders[y * ScreenWidth() + x]         = powderType::air;
+      powders[y * WIDTH + ( x - 1 )] = type;
+      powders[y * WIDTH + x]         = powderType::air;
       return true;
     }
     return false;
   }
   bool movePowderRight( int x, int y, powderType type )
   {
-    if( powders[y * ScreenWidth() + ( x + 1 )] == powderType::air && x + 1 < ScreenWidth() )
+    if( powders[y * WIDTH + ( x + 1 )] == powderType::air && x + 1 < WIDTH )
     {
-      powders[y * ScreenWidth() + ( x + 1 )] = type;
-      powders[y * ScreenWidth() + x]         = powderType::air;
+      powders[y * WIDTH + ( x + 1 )] = type;
+      powders[y * WIDTH + x]         = powderType::air;
       return true;
     }
     return false;
   }
   bool movePowderDown( int x, int y, powderType type )
   {
-    if( powders[( y + 1 ) * ScreenWidth() + x] == powderType::air )
+    if( powders[( y + 1 ) * WIDTH + x] == powderType::air )
     {
-      powders[( y + 1 ) * ScreenWidth() + x] = type;
-      powders[y * ScreenWidth() + x]         = powderType::air;
+      powders[( y + 1 ) * WIDTH + x] = type;
+      powders[y * WIDTH + x]         = powderType::air;
       return true;
     }
     return false;
   }
   bool movePowderDownLeft( int x, int y, powderType type )
   {
-    if( powders[( y + 1 ) * ScreenWidth() + ( x - 1 )] == powderType::air && x - 1 >= 0 )
+    if( powders[( y + 1 ) * WIDTH + ( x - 1 )] == powderType::air && x - 1 >= 0 )
     {
-      powders[( y + 1 ) * ScreenWidth() + ( x - 1 )] = type;
-      powders[y * ScreenWidth() + x]                 = powderType::air;
+      powders[( y + 1 ) * WIDTH + ( x - 1 )] = type;
+      powders[y * WIDTH + x]                 = powderType::air;
       return true;
     }
     return false;
   }
   bool movePowderDownRight( int x, int y, powderType type )
   {
-    if( powders[( y + 1 ) * ScreenWidth() + ( x + 1 )] == powderType::air && x + 1 < ScreenWidth() )
+    if( powders[( y + 1 ) * WIDTH + ( x + 1 )] == powderType::air && x + 1 < WIDTH )
     {
-      powders[( y - 1 ) * ScreenWidth() + ( x + 1 )] = type;
-      powders[y * ScreenWidth() + x]                 = powderType::air;
+      powders[( y - 1 ) * WIDTH + ( x + 1 )] = type;
+      powders[y * WIDTH + x]                 = powderType::air;
       return true;
     }
     return false;
@@ -243,6 +257,6 @@ public:
 int main()
 {
   PowderGame game;
-  if( game.Construct( 200, 200, 4, 4 ) ) game.Start();
+  if( game.Construct( 800, 800, 1, 1 ) ) game.Start();
   return 0;
 }
