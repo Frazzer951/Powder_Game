@@ -1,9 +1,10 @@
 #define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine.h"
+#include "powders.h"
 
 bool DEBUG = false;
 
-enum class powderType { air, sand, water };
+//enum class powderType { air, sand, water };
 
 class PowderGame : public olc::PixelGameEngine
 {
@@ -11,28 +12,36 @@ public:
   PowderGame() { sAppName = "Powder Game"; }
 
 private:
-  std::unique_ptr<powderType[]> powders;
-  int                           WIDTH;                   // Game World Width
-  int                           HEIGHT;                  // Game World Height
-  int                           powderSize       = 4;    // Size of a single Powder
-  unsigned int                  uBrushScale      = 1;
-  bool                          bSimulate        = false;
-  float                         fTargetFrameTime = 1.0f / 100.0f;    // Virtual FPS of 100fps
-  float                         fAccumulatedTime = 0.0f;
+  air *   AIR;
+  sand *  SAND;
+  water * WATER;
+
+  std::unique_ptr<air *[]> powders;
+  int                      WIDTH;                   // Game World Width
+  int                      HEIGHT;                  // Game World Height
+  int                      powderSize       = 4;    // Size of a single Powder
+  unsigned int             uBrushScale      = 1;
+  bool                     bSimulate        = false;
+  float                    fTargetFrameTime = 1.0f / 100.0f;    // Virtual FPS of 100fps
+  float                    fAccumulatedTime = 0.0f;
 
 public:
   bool OnUserCreate() override
   {
-    WIDTH  = ScreenWidth() / powderSize;
-    HEIGHT = ScreenHeight() / powderSize;
+    WIDTH   = ScreenWidth() / powderSize;
+    HEIGHT  = ScreenHeight() / powderSize;
+    powders = std::make_unique<air *[]>( WIDTH * HEIGHT );
+    AIR     = new air( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
+    SAND    = new sand( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
+    WATER   = new water( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
 
-    powders = std::make_unique<powderType[]>( WIDTH * HEIGHT );
+
     for( int y = 0; y < HEIGHT; y++ )
     {
       for( int x = 0; x < WIDTH; x++ )
       {
-        powders[y * WIDTH + x] = powderType::air;
-        if( x == 100 && y >= 95 && y < 105 ) powders[y * WIDTH + x] = powderType::sand;
+        powders[y * WIDTH + x] = AIR;
+        if( x == 100 && y >= 95 && y < 105 ) powders[y * WIDTH + x] = SAND;
       }
     }
 
@@ -44,15 +53,15 @@ public:
     // Take user input
     if( GetMouse( 0 ).bHeld )    // Add sand on left click
     {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderType::sand, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, SAND, uBrushScale );
     }
     if( GetMouse( 0 ).bHeld && GetKey( olc::Key::CTRL ).bHeld )    // Add sand on left click
     {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderType::water, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, WATER, uBrushScale );
     }
     if( GetMouse( 1 ).bHeld )    // Set to air on right click
     {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderType::air, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale );
     }
     if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
     if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
@@ -78,21 +87,7 @@ public:
       // Update powders
       for( int y = HEIGHT - 1; y >= 0; y-- )
       {
-        for( int x = 0; x < WIDTH; x++ )
-        {
-          switch( powders[y * WIDTH + x] )
-          {
-            case powderType::air:    // Do nothing
-              break;
-            case powderType::sand:    // Update Sand
-              moveSand( x, y );
-              break;
-            case powderType::water:    // Update Water
-              moveWater( x, y );
-              break;
-            default: break;
-          }
-        }
+        for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->update( x, y ); }
       }
     }
     // Clear the screen
@@ -108,22 +103,7 @@ public:
     // Draw in powders
     for( int y = 0; y < HEIGHT; y++ )
     {
-      for( int x = 0; x < WIDTH; x++ )
-      {
-        switch( powders[y * WIDTH + x] )
-        {
-          case powderType::air:    // Do nothing
-            break;
-          case powderType::sand:    // Draw Sand
-            //Draw( x, y, olc::Pixel( 194, 178, 128 ) );
-            FillRect( { x * powderSize, y * powderSize }, { powderSize, powderSize }, olc::Pixel( 194, 178, 128 ) );
-            break;
-          case powderType::water:    // Draw Water
-            //Draw( x, y, olc::Pixel( 0, 0, 255 ) );
-            FillRect( { x * powderSize, y * powderSize }, { powderSize, powderSize }, olc::Pixel( 0, 0, 255 ) );
-            break;
-        }
-      }
+      for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->draw( this, { x, y }, powderSize ); }
     }
 
     // If Paused display how to unpause on screen
@@ -148,7 +128,7 @@ public:
     return true;
   }
 
-  void fillPowderCircle( int x, int y, powderType type, int scale )
+  void fillPowderCircle( int x, int y, air * type, int scale )
   {
     scale--;
     for( int i = -scale; i <= scale; i++ )
@@ -162,6 +142,7 @@ public:
     return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() );
   }
 
+  /*
   void moveSand( int x, int y )
   {
     // Check 3 positions and move accordingly
@@ -268,6 +249,7 @@ public:
     }
     return false;
   }
+  */
 };
 
 int main()
