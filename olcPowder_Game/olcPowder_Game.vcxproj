@@ -155,10 +155,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="powderGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="olcPixelGameEngine.h" />
+    <ClInclude Include="powders.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="olcPowder_Game.ruleset" />
