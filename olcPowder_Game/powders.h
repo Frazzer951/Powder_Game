@@ -4,10 +4,10 @@
 
 struct air
 {
-  const std::string name = "air";
-  int               WIDTH;      // Game World Width
-  int               HEIGHT;     // Game World Height
-  air **            powders;    // Array of the game world
+  std::string name = "air";
+  int         WIDTH;      // Game World Width
+  int         HEIGHT;     // Game World Height
+  air **      powders;    // Array of the game world
 
   air( olc::vi2d worldSize, air * world[] ) : WIDTH { worldSize.x }, HEIGHT { worldSize.y }, powders { world } {}
 
@@ -76,12 +76,17 @@ struct air
 
 struct sand : public air
 {
-  const std::string name = "sand";
-
-  sand( olc::vi2d worldSize, air * world[] ) : air { worldSize, world } {}
+  sand( olc::vi2d worldSize, air * world[] ) : air { worldSize, world } { name = "sand"; }
 
   virtual void update( int x, int y )
   {
+    // If water is below sand swap places
+    if( inRange( x, y + 1 ) && powders[( y + 1 ) * WIDTH + x]->name == "water" )
+    {
+      swap( olc::vi2d( x, y ), olc::vi2d( x, y + 1 ) );
+      return;
+    }
+
     // Check 3 positions and move accordingly
     if( movePowderDown( x, y ) ) return;
 
@@ -109,9 +114,7 @@ struct sand : public air
 
 struct water : public air
 {
-  const std::string name = "water";
-
-  water( olc::vi2d worldSize, air * world[] ) : air { worldSize, world } {}
+  water( olc::vi2d worldSize, air * world[] ) : air { worldSize, world } { name = "water"; }
 
   virtual void update( int x, int y )
   {
@@ -131,8 +134,6 @@ struct water : public air
       if( movePowderDownRight( x, y ) ) return;
       if( movePowderDownLeft( x, y ) ) return;
     }
-
-    bRand = rand() % 2;
 
     if( bRand )
     {

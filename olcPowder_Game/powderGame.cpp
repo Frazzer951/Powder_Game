@@ -4,8 +4,6 @@
 
 bool DEBUG = false;
 
-//enum class powderType { air, sand, water };
-
 class PowderGame : public olc::PixelGameEngine
 {
 public:
@@ -90,6 +88,7 @@ public:
         for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->update( x, y ); }
       }
     }
+
     // Clear the screen
     Clear( olc::VERY_DARK_GREY );
 
@@ -107,23 +106,28 @@ public:
     }
 
     // If Paused display how to unpause on screen
-    if( !bSimulate ) DrawString( 0, 0, "Press SPACE to Unpause", olc::WHITE );
+    if( !bSimulate ) DrawString( 0, 1, "Press SPACE to Unpause", olc::WHITE );
 
     if( DEBUG )
     {
       // Debug Info
-      DrawString( 0, 8, "Width: " + std::to_string( WIDTH ) + ", Height: " + std::to_string( HEIGHT ) );
-      DrawString( 0,
-                  16,
+      DrawString( 1, 9, "Width: " + std::to_string( WIDTH ) + ", Height: " + std::to_string( HEIGHT ) );
+      DrawString( 1,
+                  18,
                   "Raw_Mouse_X: " + std::to_string( GetMouseX() ) + ", Raw_Mouse_Y: " + std::to_string( GetMouseY() ) );
-      DrawString( 0,
-                  24,
+      DrawString( 1,
+                  27,
                   "Mouse_X: " + std::to_string( GetMouseX() / powderSize )
                       + ", Mouse_Y: " + std::to_string( GetMouseY() / powderSize ) );
+
+      auto counts = countPowders();
+      DrawString( 400, 1, "Air: " + std::to_string( counts[0] ) );
+      DrawString( 400, 9, "Sand: " + std::to_string( counts[1] ) );
+      DrawString( 400, 18, "Water: " + std::to_string( counts[2] ) );
     }
 
     // Display Brush Scale
-    DrawString( 0, ScreenHeight() - 8, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE );
+    DrawString( 1, ScreenHeight() - 16, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE, 2 );
 
     return true;
   }
@@ -142,114 +146,24 @@ public:
     return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() );
   }
 
-  /*
-  void moveSand( int x, int y )
+  std::vector<int> countPowders()
   {
-    // Check 3 positions and move accordingly
+    std::vector<int> counts = { 0, 0, 0 };
 
-    if( y + 1 >= WIDTH ) return;
-
-    if( movePowderDown( x, y, powderType::sand ) ) return;
-
-    bool bRand = rand() % 2;
-
-    if( bRand )
+    for( int y = HEIGHT - 1; y >= 0; y-- )
     {
-      if( movePowderDownLeft( x, y, powderType::sand ) ) return;
-      if( movePowderDownRight( x, y, powderType::sand ) ) return;
+      for( int x = 0; x < WIDTH; x++ )
+      {
+        std::string name = powders[y * WIDTH + x]->name;
+        if( name == "air" ) counts[0]++;
+        else if( name == "sand" )
+          counts[1]++;
+        else if( name == "water" )
+          counts[2]++;
+      }
     }
-    else
-    {
-      if( movePowderDownRight( x, y, powderType::sand ) ) return;
-      if( movePowderDownLeft( x, y, powderType::sand ) ) return;
-    }
+    return counts;
   }
-  void moveWater( int x, int y )
-  {
-    // Check 5 positions and move accordingly
-    // Similar to sand, but will also move left and right
-    if( y + 1 >= WIDTH ) return;
-
-    if( movePowderDown( x, y, powderType::water ) ) return;
-
-    bool bRand = rand() % 2;
-
-    if( bRand )
-    {
-      if( movePowderDownLeft( x, y, powderType::water ) ) return;
-      if( movePowderDownRight( x, y, powderType::water ) ) return;
-    }
-    else
-    {
-      if( movePowderDownRight( x, y, powderType::water ) ) return;
-      if( movePowderDownLeft( x, y, powderType::water ) ) return;
-    }
-
-    bRand = rand() % 2;
-
-    if( bRand )
-    {
-      if( movePowderLeft( x, y, powderType::water ) ) return;
-      if( movePowderRight( x, y, powderType::water ) ) return;
-    }
-    else
-    {
-      if( movePowderRight( x, y, powderType::water ) ) return;
-      if( movePowderLeft( x, y, powderType::water ) ) return;
-    }
-  }
-
-  bool movePowderLeft( int x, int y, powderType type )
-  {
-    if( powders[y * WIDTH + ( x - 1 )] == powderType::air && x - 1 >= 0 )
-    {
-      powders[y * WIDTH + ( x - 1 )] = type;
-      powders[y * WIDTH + x]         = powderType::air;
-      return true;
-    }
-    return false;
-  }
-  bool movePowderRight( int x, int y, powderType type )
-  {
-    if( powders[y * WIDTH + ( x + 1 )] == powderType::air && x + 1 < WIDTH )
-    {
-      powders[y * WIDTH + ( x + 1 )] = type;
-      powders[y * WIDTH + x]         = powderType::air;
-      return true;
-    }
-    return false;
-  }
-  bool movePowderDown( int x, int y, powderType type )
-  {
-    if( powders[( y + 1 ) * WIDTH + x] == powderType::air )
-    {
-      powders[( y + 1 ) * WIDTH + x] = type;
-      powders[y * WIDTH + x]         = powderType::air;
-      return true;
-    }
-    return false;
-  }
-  bool movePowderDownLeft( int x, int y, powderType type )
-  {
-    if( powders[( y + 1 ) * WIDTH + ( x - 1 )] == powderType::air && x - 1 >= 0 )
-    {
-      powders[( y + 1 ) * WIDTH + ( x - 1 )] = type;
-      powders[y * WIDTH + x]                 = powderType::air;
-      return true;
-    }
-    return false;
-  }
-  bool movePowderDownRight( int x, int y, powderType type )
-  {
-    if( powders[( y + 1 ) * WIDTH + ( x + 1 )] == powderType::air && x + 1 < WIDTH )
-    {
-      powders[( y - 1 ) * WIDTH + ( x + 1 )] = type;
-      powders[y * WIDTH + x]                 = powderType::air;
-      return true;
-    }
-    return false;
-  }
-  */
 };
 
 int main()
