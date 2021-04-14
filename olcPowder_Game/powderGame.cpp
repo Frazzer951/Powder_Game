@@ -63,19 +63,12 @@ public:
       fillPowderCircle( GetMouseX() / powderSize,
                         GetMouseY() / powderSize,
                         powderTypes[selectedPowderIndex],
-                        uBrushScale );
-    }
-    if( GetMouse( 0 ).bHeld )    // Fill a circle with selected powder and replace anything that was already there
-    {
-      fillPowderCircle( GetMouseX() / powderSize,
-                        GetMouseY() / powderSize,
-                        powderTypes[selectedPowderIndex],
                         uBrushScale,
-                        true );
+                        GetKey( olc::Key::CTRL ).bHeld );
     }
     if( GetMouse( 1 ).bHeld )    // Set to air on right click
     {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale, true );
     }
     if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
     if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
@@ -168,7 +161,9 @@ public:
         if( inRange( i + x, j + y ) && i * i + j * j <= scale * scale )
         {
           if( replace || powders[( j + y ) * WIDTH + ( i + x )]->name == "air" )
+          {
             powders[( j + y ) * WIDTH + ( i + x )] = type;
+          }
         }
   }
 
