@@ -33,8 +33,11 @@ public:
   bool             OnUserCreate() override;
   bool             OnUserUpdate( float fElapsedTime ) override;
   void             fillPowderCircle( int x, int y, air * type, int scale, bool replace = false );
-  std::vector<int> countPowders();
   void             displayDebugInfo();
+  void             takeUserInput();
+  void             drawScreen();
+  void             simulatePowders();
+  std::vector<int> countPowders();
 
   bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
   bool inRangeScreen( int x, int y )

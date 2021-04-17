@@ -36,34 +36,7 @@ inline bool PowderGame::OnUserCreate()
 
 inline bool PowderGame::OnUserUpdate( float fElapsedTime )
 {
-  // Take user input
-  if( GetMouse( 0 ).bHeld )    // Fill a circle with selected powder
-  {
-    fillPowderCircle( GetMouseX() / powderSize,
-                      GetMouseY() / powderSize,
-                      powderTypes[selectedPowderIndex],
-                      uBrushScale,
-                      GetKey( olc::Key::CTRL ).bHeld );
-  }
-  if( GetMouse( 1 ).bHeld )    // Set to air on right click
-  {
-    fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale, true );
-  }
-  if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
-  if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
-  if( GetKey( olc::Key::NP_SUB ).bPressed )                               // Shrink the brush
-  {
-    uBrushScale--;
-    if( uBrushScale < 1 ) uBrushScale = 1;
-  }
-  if( GetMouseWheel() > 0 )
-  {
-    selectedPowderIndex = ( selectedPowderIndex + 1 ) % numPowders;
-  }    // Scroll up to increment selected powder
-  if( GetMouseWheel() < 0 )
-  {
-    selectedPowderIndex = ( numPowders + ( ( selectedPowderIndex - 1 ) % numPowders ) ) % numPowders;
-  }    // Scroll down to decrement selected powder
+  takeUserInput();
 
   // Only update the game at the specified frame rate
   fAccumulatedTime += fElapsedTime;
@@ -76,46 +49,20 @@ inline bool PowderGame::OnUserUpdate( float fElapsedTime )
     return true;    // Don't do anything this frame
 
   // Only update the simulation if the game is not paused
-  if( bSimulate )
-  {
-    // Update powders
-    for( int y = HEIGHT - 1; y >= 0; y-- )
-    {
-      for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->update( x, y ); }
-    }
-  }
+  if( bSimulate ) { simulatePowders(); }
 
-  // Clear the screen
-  Clear( olc::VERY_DARK_GREY );
-
-  // Draw in brush outline
-  int scale = uBrushScale - 1, x = GetMouseX() / powderSize, y = GetMouseY() / powderSize;
-  for( int i = -scale; i <= scale; i++ )
-    for( int j = -scale; j <= scale; j++ )
-      if( inRangeScreen( i + x, j + y ) && i * i + j * j <= scale * scale )
-        FillRect( { ( i + x ) * powderSize, ( j + y ) * powderSize }, { powderSize, powderSize }, olc::CYAN );
-
-  // Draw in powders
-  for( int y = 0; y < HEIGHT; y++ )
-  {
-    for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->draw( this, { x, y }, powderSize ); }
-  }
-
-
-
-  // If Paused display how to unpause on screen
-  if( !bSimulate ) DrawString( 1, 1, "Press SPACE to Unpause", olc::WHITE,2 );
-
-  if( DEBUG ) { displayDebugInfo(); }
-
-  // Display Brush Scale
-  DrawString( 1, ScreenHeight() - 33, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE, 2 );
-
-  // Display Selected Powder
-  std::string selPowder = "Selected Powder: " + powderTypes[selectedPowderIndex]->name;
-  DrawString(1, ScreenHeight() - 16, selPowder, olc::WHITE, 2 );
+  drawScreen();
 
   return true;
+}
+
+inline void PowderGame::simulatePowders()
+{
+  // Update powders
+  for( int y = HEIGHT - 1; y >= 0; y-- )
+  {
+    for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->update( x, y ); }
+  }
 }
 
 inline void PowderGame::fillPowderCircle( int x, int y, air * type, int scale, bool replace )
@@ -167,4 +114,67 @@ void PowderGame::displayDebugInfo()
   DrawString( 400, 1, "Air: " + std::to_string( counts[0] ) );
   DrawString( 400, 9, "Sand: " + std::to_string( counts[1] ) );
   DrawString( 400, 18, "Water: " + std::to_string( counts[2] ) );
+}
+
+inline void PowderGame::takeUserInput()
+{
+  // Take user input
+  if( GetMouse( 0 ).bHeld )    // Fill a circle with selected powder
+  {
+    fillPowderCircle( GetMouseX() / powderSize,
+                      GetMouseY() / powderSize,
+                      powderTypes[selectedPowderIndex],
+                      uBrushScale,
+                      GetKey( olc::Key::CTRL ).bHeld );
+  }
+  if( GetMouse( 1 ).bHeld )    // Set to air on right click
+  {
+    fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale, true );
+  }
+  if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
+  if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
+  if( GetKey( olc::Key::NP_SUB ).bPressed )                               // Shrink the brush
+  {
+    uBrushScale--;
+    if( uBrushScale < 1 ) uBrushScale = 1;
+  }
+  if( GetMouseWheel() > 0 )
+  {
+    selectedPowderIndex = ( selectedPowderIndex + 1 ) % numPowders;
+  }    // Scroll up to increment selected powder
+  if( GetMouseWheel() < 0 )
+  {
+    selectedPowderIndex = ( numPowders + ( ( selectedPowderIndex - 1 ) % numPowders ) ) % numPowders;
+  }    // Scroll down to decrement selected powder
+}
+
+void PowderGame::drawScreen()
+{
+  // Clear the screen
+  Clear( olc::VERY_DARK_GREY );
+
+  // Draw in brush outline
+  int scale = uBrushScale - 1, x = GetMouseX() / powderSize, y = GetMouseY() / powderSize;
+  for( int i = -scale; i <= scale; i++ )
+    for( int j = -scale; j <= scale; j++ )
+      if( inRangeScreen( i + x, j + y ) && i * i + j * j <= scale * scale )
+        FillRect( { ( i + x ) * powderSize, ( j + y ) * powderSize }, { powderSize, powderSize }, olc::CYAN );
+
+  // Draw in powders
+  for( int y = 0; y < HEIGHT; y++ )
+  {
+    for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->draw( this, { x, y }, powderSize ); }
+  }
+
+  // If Paused display how to unpause on screen
+  if( !bSimulate ) DrawString( 1, 1, "Press SPACE to Unpause", olc::WHITE, 2 );
+
+  if( DEBUG ) { displayDebugInfo(); }
+
+  // Display Brush Scale
+  DrawString( 1, ScreenHeight() - 33, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE, 2 );
+
+  // Display Selected Powder
+  std::string selPowder = "Selected Powder: " + powderTypes[selectedPowderIndex]->name;
+  DrawString( 1, ScreenHeight() - 16, selPowder, olc::WHITE, 2 );
 }
