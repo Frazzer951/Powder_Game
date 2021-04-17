@@ -1,7 +1,7 @@
 #pragma once
 
 #include "olcPixelGameEngine.h"
-
+/*
 struct air
 {
   std::string name = "air";
@@ -198,4 +198,4 @@ struct stone : public air
                    { powderSize, powderSize },
                    olc::Pixel( 136, 140, 141 ) );
   }
-};
+};*/
