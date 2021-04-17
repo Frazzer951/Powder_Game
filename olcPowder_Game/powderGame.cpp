@@ -1,4 +1,6 @@
 #define OLC_PGE_APPLICATION
+#include <vector>
+
 #include "olcPixelGameEngine.h"
 #include "powders.h"
 
@@ -13,6 +15,11 @@ private:
   air *   AIR;
   sand *  SAND;
   water * WATER;
+  stone * STONE;
+
+  std::vector<air *> powderTypes;
+  int                selectedPowderIndex = 0;
+  int                numPowders          = 3;
 
   std::unique_ptr<air *[]> powders;
   int                      WIDTH;                   // Game World Width
@@ -20,7 +27,7 @@ private:
   int                      powderSize       = 4;    // Size of a single Powder
   unsigned int             uBrushScale      = 1;
   bool                     bSimulate        = false;
-  float                    fTargetFrameTime = 1.0f / 100.0f;    // Virtual FPS of 100fps
+  float                    fTargetFrameTime = 1.0f / 50.0f;    // Virtual FPS of 50fps
   float                    fAccumulatedTime = 0.0f;
 
 public:
@@ -32,7 +39,9 @@ public:
     AIR     = new air( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
     SAND    = new sand( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
     WATER   = new water( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
+    STONE   = new stone( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
 
+    powderTypes = { SAND, WATER, STONE };
 
     for( int y = 0; y < HEIGHT; y++ )
     {
@@ -49,17 +58,17 @@ public:
   bool OnUserUpdate( float fElapsedTime ) override
   {
     // Take user input
-    if( GetMouse( 0 ).bHeld )    // Add sand on left click
+    if( GetMouse( 0 ).bHeld )    // Fill a circle with selected powder
     {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, SAND, uBrushScale );
-    }
-    if( GetMouse( 0 ).bHeld && GetKey( olc::Key::CTRL ).bHeld )    // Add sand on left click
-    {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, WATER, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize,
+                        GetMouseY() / powderSize,
+                        powderTypes[selectedPowderIndex],
+                        uBrushScale,
+                        GetKey( olc::Key::CTRL ).bHeld );
     }
     if( GetMouse( 1 ).bHeld )    // Set to air on right click
     {
-      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale );
+      fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale, true );
     }
     if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
     if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
@@ -68,6 +77,14 @@ public:
       uBrushScale--;
       if( uBrushScale < 1 ) uBrushScale = 1;
     }
+    if( GetMouseWheel() > 0 )
+    {
+      selectedPowderIndex = ( selectedPowderIndex + 1 ) % numPowders;
+    }    // Scroll up to increment selected powder
+    if( GetMouseWheel() < 0 )
+    {
+      selectedPowderIndex = ( numPowders + ( ( selectedPowderIndex - 1 ) % numPowders ) ) % numPowders;
+    }    // Scroll down to decrement selected powder
 
     // Only update the game at the specified frame rate
     fAccumulatedTime += fElapsedTime;
@@ -129,15 +146,25 @@ public:
     // Display Brush Scale
     DrawString( 1, ScreenHeight() - 16, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE, 2 );
 
+    // Display Selected Powder
+    std::string selPowder = "Selected Powder: " + powderTypes[selectedPowderIndex]->name;
+    DrawString( ScreenWidth() - selPowder.size() * 16, ScreenHeight() - 16, selPowder, olc::WHITE, 2 );
+
     return true;
   }
 
-  void fillPowderCircle( int x, int y, air * type, int scale )
+  void fillPowderCircle( int x, int y, air * type, int scale, bool replace = false )
   {
     scale--;
     for( int i = -scale; i <= scale; i++ )
       for( int j = -scale; j <= scale; j++ )
-        if( inRange( i + x, j + y ) && i * i + j * j <= scale * scale ) powders[( j + y ) * WIDTH + ( i + x )] = type;
+        if( inRange( i + x, j + y ) && i * i + j * j <= scale * scale )
+        {
+          if( replace || powders[( j + y ) * WIDTH + ( i + x )]->name == "air" )
+          {
+            powders[( j + y ) * WIDTH + ( i + x )] = type;
+          }
+        }
   }
 
   bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
