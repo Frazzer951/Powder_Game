@@ -120,11 +120,11 @@ struct water : public air
   {
     // Check 5 positions and move accordingly
     // Similar to sand, but will also move left and right
-    if( movePowderDown( x, y ) ) return;
+    if( movePowderDown( x, y ) ) return;    // Try moving down
 
-    bool bRand = rand() % 2;
+    bool bRand = rand() % 2;    // Generate random bool
 
-    if( bRand )
+    if( bRand )    // Try moving down left or right
     {
       if( movePowderDownLeft( x, y ) ) return;
       if( movePowderDownRight( x, y ) ) return;
@@ -135,7 +135,22 @@ struct water : public air
       if( movePowderDownLeft( x, y ) ) return;
     }
 
-    if( bRand )
+    if( bRand )    // If there is an opening down left or right move towards it
+    {
+      if( openDownLeft( x, y ) )
+        if( movePowderLeft( x, y ) ) return;
+      if( openDownRight( x, y ) )
+        if( movePowderRight( x, y ) ) return;
+    }
+    else
+    {
+      if( openDownRight( x, y ) )
+        if( movePowderRight( x, y ) ) return;
+      if( openDownLeft( x, y ) )
+        if( movePowderLeft( x, y ) ) return;
+    }
+
+    if( bRand )    // Try moving left or right
     {
       if( movePowderLeft( x, y ) ) return;
       if( movePowderRight( x, y ) ) return;
@@ -150,5 +165,37 @@ struct water : public air
   virtual void draw( olc::PixelGameEngine * pge, olc::vi2d pos, int powderSize )
   {
     pge->FillRect( { pos.x * powderSize, pos.y * powderSize }, { powderSize, powderSize }, olc::Pixel( 0, 0, 255 ) );
+  }
+
+  bool openDownLeft( int x, int y )
+  {
+    for( int i = x - 1; i >= 0; i-- )
+    {
+      if( !inRange( i, y + 1 ) ) break;
+      if( powders[( y + 1 ) * WIDTH + i]->name == "air" ) return true;
+    }
+    return false;
+  }
+
+  bool openDownRight( int x, int y )
+  {
+    for( int i = x + 1; i < WIDTH; i++ )
+    {
+      if( !inRange( i, y + 1 ) ) break;
+      if( powders[( y + 1 ) * WIDTH + i]->name == "air" ) return true;
+    }
+    return false;
+  }
+};
+
+struct stone : public air
+{
+  stone( olc::vi2d worldSize, air * world[] ) : air { worldSize, world } { name = "stone"; }
+
+  virtual void draw( olc::PixelGameEngine * pge, olc::vi2d pos, int powderSize )
+  {
+    pge->FillRect( { pos.x * powderSize, pos.y * powderSize },
+                   { powderSize, powderSize },
+                   olc::Pixel( 136, 140, 141 ) );
   }
 };
