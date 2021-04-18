@@ -2,6 +2,13 @@
 
 #include "powderGame.h"
 
+int main()
+{
+  PowderGame game;
+  if( game.Construct( 800, 800, 1, 1 ) ) game.Start();
+  return 0;
+}
+
 inline bool PowderGame::OnUserCreate()
 {
   WIDTH   = ScreenWidth() / powderSize;
@@ -178,11 +185,4 @@ void PowderGame::drawScreen()
   // Display Selected Powder
   std::string selPowder = "Selected Powder: " + powderEnumToString( selectablePowders[selectedPowderIndex] );
   DrawString( 1, ScreenHeight() - 16, selPowder, olc::WHITE, 2 );
-}
-
-int main()
-{
-  PowderGame game;
-  if( game.Construct( 800, 800, 1, 1 ) ) game.Start();
-  return 0;
 }
