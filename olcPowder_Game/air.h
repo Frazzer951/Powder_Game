@@ -1,7 +1,8 @@
 #pragma once
 
 #include "olcPixelGameEngine.h"
-#include "powderGame.h"
+
+class PowderGame;
 
 struct air
 {

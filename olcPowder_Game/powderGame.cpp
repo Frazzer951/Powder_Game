@@ -1,6 +1,7 @@
 #define OLC_PGE_APPLICATION
 
 #include "powderGame.h"
+#include "sand.h"
 
 int main()
 {

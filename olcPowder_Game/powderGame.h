@@ -2,13 +2,10 @@
 
 #include "air.h"
 #include "olcPixelGameEngine.h"
-#include "sand.h"
-
-bool DEBUG = false;
 
 enum class powderTypes { AIR, SAND };
 
-std::string powderEnumToString( powderTypes type )
+inline std::string powderEnumToString( powderTypes type )
 {
   switch( type )
   {
@@ -33,6 +30,7 @@ private:
   int                      powderSize  = 4;    // Size of a single Powder
   unsigned int             uBrushScale = 1;
   bool                     bSimulate   = false;
+  bool                     DEBUG       = false;
 
 public:
   float gravity = 9.8f;
