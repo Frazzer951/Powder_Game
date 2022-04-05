@@ -14,7 +14,29 @@ file(DOWNLOAD
 include_directories(src)
 include_directories(external)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/olcPixelGameEngine.cpp)
+file(GLOB src_files
+        "src/*.cpp"
+        "src/*.hpp"
+        "src/*.h"
+)
+
+file(GLOB element_files
+        "src/elements/*.cpp"
+        "src/elements/*.hpp"
+        "src/elements/*.h"
+)
+
+file(GLOB_RECURSE extern_files
+        "external/*.cpp"
+        "external/*.hpp"
+        "external/*.h"
+)
+
+# message("Src: ${src_files}")
+# message("Elements: ${element_files}")
+# message("Extern: ${extern_files}")
+
+add_executable(${PROJECT_NAME} src/main.cpp ${src_files} ${element_files} ${extern_files})
 
 #target_clangformat_setup(${PROJECT_NAME})
 

@@ -8,8 +8,8 @@ class Element
 {
 public:
   Element( int x, int y ) : x( x ), y( y ) {}
-  virtual void update()                           = 0;
-  virtual void draw( olc::PixelGameEngine * pge ) = 0;
+  virtual void update( olc::PixelGameEngine * pge ) = 0;
+  virtual void draw( olc::PixelGameEngine * pge )   = 0;
 
 protected:
   int        x;

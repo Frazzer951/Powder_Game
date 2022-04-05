@@ -5,7 +5,10 @@
 
 
 class Solid : public Element
-{};
+{
+public:
+  Solid( int x, int y ) : Element( x, y ) {}
+};
 
 
 #endif    // POWDERGAME_SOLID_H

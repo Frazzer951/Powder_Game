@@ -1,5 +1,6 @@
 #include "elements/Air.h"
 #include "elements/Element.h"
+#include "elements/Sand.h"
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
@@ -13,19 +14,26 @@ private:
 public:
   PowderGame() { sAppName = "PowderGame"; }
 
-public:
   bool OnUserCreate() override
   {
     WIDTH    = ScreenWidth();
     HEIGHT   = ScreenHeight();
-    elements = std::make_unique<Element*[]>( WIDTH * HEIGHT );
+    elements = std::make_unique<Element *[]>( WIDTH * HEIGHT );
 
     for( int y = 0; y < HEIGHT; y++ )
     {
       for( int x = 0; x < WIDTH; x++ )
       {
-        Air* elem = new Air(x,y);
-        elements[y * WIDTH + x] = elem;
+        if( ( x >= 100 && x <= 120 ) && ( y >= 100 && y <= 120 ) )
+        {
+          Sand * elem             = new Sand( x, y );
+          elements[y * WIDTH + x] = elem;
+        }
+        else
+        {
+          Air * elem              = new Air( x, y );
+          elements[y * WIDTH + x] = elem;
+        }
       }
     }
 
@@ -46,6 +54,8 @@ public:
     }
     return true;
   }
+
+  Element * GetElementAt( int x, int y ) { return elements[y * WIDTH + x]; }
 };
 
 
