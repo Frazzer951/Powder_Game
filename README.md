@@ -1,10 +1,8 @@
-# olcPowder_Game
-## A sand physics game built with the pixel game engine
+# PowderGame
+## A sand physics game built with the [pixel game engine](https://github.com/OneLoneCoder/olcPixelGameEngine)
 
-## Build
-To build the project, open the Visual Studio solution and build.
-
-Or, since powderGame.cpp is the only cpp file, you can compile that file with any prefered method
+## Resources
+https://www.youtube.com/watch?v=5Ka3tbbT-9E&ab_channel=MARF
 
 ## Keybinds
 Key | Action
