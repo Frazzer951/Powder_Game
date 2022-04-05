@@ -18,15 +18,21 @@
     <ClCompile Include="powderGame.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="sand.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="olcPixelGameEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="powders.h">
+    <ClInclude Include="powderGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="powderGame.h">
+    <ClInclude Include="air.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="sand.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

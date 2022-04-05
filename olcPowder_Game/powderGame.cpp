@@ -1,7 +1,7 @@
 #define OLC_PGE_APPLICATION
-#include <vector>
 
 #include "powderGame.h"
+#include "sand.h"
 
 int main()
 {
@@ -15,19 +15,14 @@ inline bool PowderGame::OnUserCreate()
   WIDTH   = ScreenWidth() / powderSize;
   HEIGHT  = ScreenHeight() / powderSize;
   powders = std::make_unique<air *[]>( WIDTH * HEIGHT );
-  AIR     = new air( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
-  SAND    = new sand( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
-  WATER   = new water( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
-  STONE   = new stone( olc::vi2d( WIDTH, HEIGHT ), powders.get() );
-
-  powderTypes = { SAND, WATER, STONE };
 
   for( int y = 0; y < HEIGHT; y++ )
   {
     for( int x = 0; x < WIDTH; x++ )
     {
-      powders[y * WIDTH + x] = AIR;
-      if( x == 100 && y >= 95 && y < 105 ) powders[y * WIDTH + x] = SAND;
+      if( x == 100 && y >= 95 && y < 105 ) powders[y * WIDTH + x] = new sand( this );
+      else
+        powders[y * WIDTH + x] = new air( this );
     }
   }
 
@@ -38,34 +33,48 @@ inline bool PowderGame::OnUserUpdate( float fElapsedTime )
 {
   takeUserInput();
 
-  // Only update the game at the specified frame rate
-  fAccumulatedTime += fElapsedTime;
-  if( fAccumulatedTime >= fTargetFrameTime )
-  {
-    fAccumulatedTime -= fTargetFrameTime;
-    fElapsedTime = fTargetFrameTime;
-  }
-  else
-    return true;    // Don't do anything this frame
-
   // Only update the simulation if the game is not paused
-  if( bSimulate ) { simulatePowders(); }
+  if( bSimulate ) { simulatePowders( fElapsedTime ); }
 
   drawScreen();
 
   return true;
 }
 
-inline void PowderGame::simulatePowders()
+inline void PowderGame::simulatePowders( float fElapsedTime )
 {
   // Update powders
   for( int y = HEIGHT - 1; y >= 0; y-- )
   {
-    for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->update( x, y ); }
+    for( int x = 0; x < WIDTH; x++ ) { powders[y * WIDTH + x]->update( { x, y }, fElapsedTime ); }
   }
 }
 
-inline void PowderGame::fillPowderCircle( int x, int y, air * type, int scale, bool replace )
+float PowderGame::clamp( float value, float min, float max )
+{
+  if( min > max )
+  {
+    float temp = min;
+    min        = max;
+    max        = temp;
+  }
+  return ( value < min ) ? min : ( value > max ) ? max : value;
+}
+
+int PowderGame::cordToIndex( int x, int y ) { return y * WIDTH + x; }
+
+air * PowderGame::getParticleAt( int x, int y ) { return powders[cordToIndex( x, y )]; }
+
+air * PowderGame::makeParticle( powderTypes type )
+{
+  switch( type )
+  {
+    case powderTypes::AIR: return new air( this );
+    case powderTypes::SAND: return new sand( this );
+  }
+}
+
+inline void PowderGame::fillPowderCircle( int x, int y, powderTypes type, int scale, bool replace )
 {
   scale--;
   for( int i = -scale; i <= scale; i++ )
@@ -74,7 +83,7 @@ inline void PowderGame::fillPowderCircle( int x, int y, air * type, int scale, b
       {
         if( replace || powders[( j + y ) * WIDTH + ( i + x )]->name == "air" )
         {
-          powders[( j + y ) * WIDTH + ( i + x )] = type;
+          powders[( j + y ) * WIDTH + ( i + x )] = makeParticle( type );
         }
       }
 }
@@ -123,13 +132,13 @@ inline void PowderGame::takeUserInput()
   {
     fillPowderCircle( GetMouseX() / powderSize,
                       GetMouseY() / powderSize,
-                      powderTypes[selectedPowderIndex],
+                      selectablePowders[selectedPowderIndex],
                       uBrushScale,
                       GetKey( olc::Key::CTRL ).bHeld );
   }
   if( GetMouse( 1 ).bHeld )    // Set to air on right click
   {
-    fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, AIR, uBrushScale, true );
+    fillPowderCircle( GetMouseX() / powderSize, GetMouseY() / powderSize, powderTypes::AIR, uBrushScale, true );
   }
   if( GetKey( olc::Key::SPACE ).bPressed ) { bSimulate = !bSimulate; }    // Pause and Unpause simulation
   if( GetKey( olc::Key::NP_ADD ).bPressed ) { uBrushScale++; }            // Enlarge the brush
@@ -175,6 +184,6 @@ void PowderGame::drawScreen()
   DrawString( 1, ScreenHeight() - 33, "Brush Scale: " + std::to_string( uBrushScale ), olc::WHITE, 2 );
 
   // Display Selected Powder
-  std::string selPowder = "Selected Powder: " + powderTypes[selectedPowderIndex]->name;
+  std::string selPowder = "Selected Powder: " + powderEnumToString( selectablePowders[selectedPowderIndex] );
   DrawString( 1, ScreenHeight() - 16, selPowder, olc::WHITE, 2 );
 }
