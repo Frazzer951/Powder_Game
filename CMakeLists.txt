@@ -6,24 +6,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # include(ClangFormat)
-include(FetchContent)
 
-FetchContent_Declare(
-        googletest
-        GIT_REPOSITORY https://github.com/google/googletest.git
-        GIT_TAG        main
-)
-
-FetchContent_GetProperties(googletest)
-if(NOT googletest_POPULATED)
-    set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
-    option(BUILD_GMOCK "Builds the googlemock subproject" OFF)
-    option(INSTALL_GTEST "Enable installation of googletest." OFF)
-    FetchContent_Populate(googletest)
-    add_subdirectory(${googletest_SOURCE_DIR} ${googletest_BINARY_DIR})
-endif()
+file(DOWNLOAD
+        https://raw.githubusercontent.com/OneLoneCoder/olcPixelGameEngine/master/olcPixelGameEngine.h
+        ${CMAKE_SOURCE_DIR}/external/olcPixelGameEngine/olcPixelGameEngine.h)
 
 include_directories(include)
+include_directories(external)
 
 add_executable(${PROJECT_NAME} src/main.cpp)
 
