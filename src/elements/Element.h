@@ -3,13 +3,14 @@
 #ifndef POWDERGAME_ELEMENT_H
 #  define POWDERGAME_ELEMENT_H
 
+class PowderGame;
 
 class Element
 {
 public:
   Element( int x, int y ) : x( x ), y( y ) {}
-  virtual void update( olc::PixelGameEngine * pge ) = 0;
-  virtual void draw( olc::PixelGameEngine * pge )   = 0;
+  virtual void update( PowderGame * pge ) = 0;
+  virtual void draw( PowderGame * pge )   = 0;
 
 protected:
   int        x;
