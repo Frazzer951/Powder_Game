@@ -2,10 +2,10 @@
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
 
-class Example : public olc::PixelGameEngine
+class PowderGame : public olc::PixelGameEngine
 {
 public:
-  Example() { sAppName = "Example"; }
+  PowderGame() { sAppName = "PowderGame"; }
 
 public:
   bool OnUserCreate() override
@@ -26,8 +26,11 @@ public:
 
 int main()
 {
-  Example demo;
-  if( demo.Construct( 256, 240, 4, 4 ) ) demo.Start();
+  const int  WIDTH  = 240;
+  const int  HEIGHT = 240;
+
+  PowderGame pGame;
+  if( pGame.Construct( WIDTH, HEIGHT, 4, 4 ) ) pGame.Start();
 
   return 0;
 }
