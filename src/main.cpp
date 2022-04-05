@@ -1,62 +1,54 @@
+#include "PowderGame.h"
+
 #include "elements/Air.h"
 #include "elements/Element.h"
 #include "elements/Sand.h"
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
-class PowderGame : public olc::PixelGameEngine
+
+bool PowderGame::OnUserCreate()
 {
-private:
-  std::unique_ptr<Element *[]> elements;
-  int                          WIDTH;
-  int                          HEIGHT;
+  WIDTH    = ScreenWidth();
+  HEIGHT   = ScreenHeight();
+  elements = std::make_unique<Element *[]>( WIDTH * HEIGHT );
 
-public:
-  PowderGame() { sAppName = "PowderGame"; }
-
-  bool OnUserCreate() override
+  for( int y = 0; y < HEIGHT; y++ )
   {
-    WIDTH    = ScreenWidth();
-    HEIGHT   = ScreenHeight();
-    elements = std::make_unique<Element *[]>( WIDTH * HEIGHT );
-
-    for( int y = 0; y < HEIGHT; y++ )
-    {
-      for( int x = 0; x < WIDTH; x++ )
-      {
-        if( ( x >= 100 && x <= 120 ) && ( y >= 100 && y <= 120 ) )
-        {
-          Sand * elem             = new Sand( x, y );
-          elements[y * WIDTH + x] = elem;
-        }
-        else
-        {
-          Air * elem              = new Air( x, y );
-          elements[y * WIDTH + x] = elem;
-        }
-      }
-    }
-
-    return true;
-  }
-
-  bool OnUserUpdate( float fElapsedTime ) override
-  {
-    // called once per frame
     for( int x = 0; x < WIDTH; x++ )
     {
-      for( int y = 0; y < HEIGHT; y++ )
+      if( ( x >= 100 && x <= 120 ) && ( y >= 100 && y <= 120 ) )
       {
-        int index = y * WIDTH + x;
-        elements[index]->update();
-        elements[index]->draw( this );
+        Sand * elem             = new Sand( x, y );
+        elements[y * WIDTH + x] = elem;
+      }
+      else
+      {
+        Air * elem              = new Air( x, y );
+        elements[y * WIDTH + x] = elem;
       }
     }
-    return true;
   }
 
-  Element * GetElementAt( int x, int y ) { return elements[y * WIDTH + x]; }
-};
+  return true;
+}
+
+bool PowderGame::OnUserUpdate( float fElapsedTime )
+{
+  // called once per frame
+  for( int x = 0; x < WIDTH; x++ )
+  {
+    for( int y = 0; y < HEIGHT; y++ )
+    {
+      int index = y * WIDTH + x;
+      elements[index]->update( this );
+      elements[index]->draw( this );
+    }
+  }
+  return true;
+}
+
+Element * PowderGame::GetElementAt( int x, int y ) { return elements[y * WIDTH + x]; }
 
 
 int main()
