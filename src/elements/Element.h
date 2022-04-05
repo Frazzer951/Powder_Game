@@ -1,5 +1,3 @@
-#include "Color.h"
-
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
 #ifndef POWDERGAME_ELEMENT_H
@@ -9,11 +7,14 @@
 class Element
 {
 public:
+  Element( int x, int y ) : x( x ), y( y ) {}
   virtual void update()                           = 0;
   virtual void draw( olc::PixelGameEngine * pge ) = 0;
 
 protected:
-  Color c;
+  int        x;
+  int        y;
+  olc::Pixel c;
 };
 
 

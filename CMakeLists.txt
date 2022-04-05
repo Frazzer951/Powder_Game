@@ -14,7 +14,7 @@ file(DOWNLOAD
 include_directories(src)
 include_directories(external)
 
-add_executable(${PROJECT_NAME} src/main.cpp src/olcPixelGameEngine.cpp src/elements/Element.h src/elements/Liquid.h src/elements/Solid.h src/elements/Gas.h src/Color.h)
+add_executable(${PROJECT_NAME} src/main.cpp src/olcPixelGameEngine.cpp)
 
 #target_clangformat_setup(${PROJECT_NAME})
 
