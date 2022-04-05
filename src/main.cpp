@@ -1,4 +1,3 @@
-#define OLC_PGE_APPLICATION
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
 
@@ -26,8 +25,8 @@ public:
 
 int main()
 {
-  const int  WIDTH  = 240;
-  const int  HEIGHT = 240;
+  const int WIDTH  = 240;
+  const int HEIGHT = 240;
 
   PowderGame pGame;
   if( pGame.Construct( WIDTH, HEIGHT, 4, 4 ) ) pGame.Start();

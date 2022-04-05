@@ -11,10 +11,10 @@ file(DOWNLOAD
         https://raw.githubusercontent.com/OneLoneCoder/olcPixelGameEngine/master/olcPixelGameEngine.h
         ${CMAKE_SOURCE_DIR}/external/olcPixelGameEngine/olcPixelGameEngine.h)
 
-include_directories(include)
+include_directories(src)
 include_directories(external)
 
-add_executable(${PROJECT_NAME} src/main.cpp)
+add_executable(${PROJECT_NAME} src/main.cpp src/olcPixelGameEngine.cpp src/elements/Element.h src/elements/Liquid.h src/elements/Solid.h src/elements/Gas.h src/Color.h)
 
 #target_clangformat_setup(${PROJECT_NAME})
 
