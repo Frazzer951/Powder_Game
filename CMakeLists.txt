@@ -7,10 +7,6 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 list(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 # include(ClangFormat)
 
-file(DOWNLOAD
-        https://raw.githubusercontent.com/OneLoneCoder/olcPixelGameEngine/master/olcPixelGameEngine.h
-        ${CMAKE_SOURCE_DIR}/external/olcPixelGameEngine/olcPixelGameEngine.h)
-
 include_directories(src)
 include_directories(external)
 
