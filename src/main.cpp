@@ -7,7 +7,6 @@
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
-
 bool PowderGame::OnUserCreate()
 {
   WIDTH            = ScreenWidth();
@@ -49,13 +48,10 @@ bool PowderGame::OnUserUpdate( float fElapsedTime )
   else
     return true;    // Don't do anything this frame
 
+  // Update all elements
   for( int y = HEIGHT - 1; y >= 0; y-- )
   {
-    for( int x = 0; x < WIDTH; x++ )
-    {
-      int index = y * WIDTH + x;
-      elements[index]->update( this );
-    }
+    for( int x = WIDTH - 1; x >= 0; x-- ) { elements[y * WIDTH + x]->update( this ); }
   }
 
   Clear( olc::BLACK );

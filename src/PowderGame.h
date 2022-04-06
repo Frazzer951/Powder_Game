@@ -1,6 +1,7 @@
 #ifndef POWDERGAME_POWDERGAME_H
 #define POWDERGAME_POWDERGAME_H
 
+#include <ctime>
 
 #include "elements/Element.h"
 
@@ -18,13 +19,18 @@ private:
 
 
 public:
-  PowderGame() { sAppName = "Powder Game"; }
+  PowderGame()
+  {
+    sAppName = "Powder Game";
+    std::srand( std::time( nullptr ) );
+  }
 
   bool      OnUserCreate() override;
   bool      OnUserUpdate( float fElapsedTime ) override;
   bool      InRange( int x, int y );
   void      swap( int x0, int y0, int x1, int y1 );
   Element * GetElementAt( int x, int y );
+  int       rand2() { return std::rand() % 2; }
 };
 
 
