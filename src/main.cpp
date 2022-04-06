@@ -3,6 +3,7 @@
 #include "elements/Element.h"
 #include "elements/EmptyCell.h"
 #include "elements/Sand.h"
+#include "elements/Stone.h"
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
@@ -13,7 +14,7 @@ bool PowderGame::OnUserCreate()
   iTargetFPS       = 60;
   fTargetFrameTime = 1.0f / iTargetFPS;
 
-  powderTypes = { "Sand" };
+  powderTypes = { "Sand", "Stone" };
 
   elements = std::make_unique<Element *[]>( WIDTH * HEIGHT );
 
@@ -128,6 +129,7 @@ void PowderGame::fillPowderCircle( int x, int y, std::string type, int scale, bo
 Element * PowderGame::CreateElement( std::string element_name )
 {
   if( element_name == "Sand" ) { return new Sand( 0, 0 ); }
+  if( element_name == "Stone" ) { return new Stone( 0, 0 ); }
   if( element_name == "Empty" ) { return new EmptyCell( 0, 0 ); }
   return nullptr;
 }
