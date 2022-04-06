@@ -16,6 +16,7 @@ bool PowderGame::OnUserCreate()
   fTargetFrameTime = 1.0f / iTargetFPS;
 
   powderTypes = { "Sand", "Stone", "Water" };
+  num_powders = powderTypes.size();
 
   elements = std::make_unique<Element *[]>( WIDTH * HEIGHT );
 
@@ -23,16 +24,8 @@ bool PowderGame::OnUserCreate()
   {
     for( int x = 0; x < WIDTH; x++ )
     {
-      if( ( x >= 100 && x <= 120 ) && ( y >= 100 && y <= 120 ) )
-      {
-        Sand * elem             = new Sand( x, y );
-        elements[y * WIDTH + x] = elem;
-      }
-      else
-      {
-        Element * elem          = new EmptyCell( x, y );
-        elements[y * WIDTH + x] = elem;
-      }
+      Element * elem          = new EmptyCell( x, y );
+      elements[y * WIDTH + x] = elem;
     }
   }
 
@@ -78,7 +71,6 @@ void PowderGame::swap( int x0, int y0, int x1, int y1 )
 }
 
 Element * PowderGame::GetElementAt( int x, int y ) { return elements[y * WIDTH + x]; }
-bool      PowderGame::InRange( int x, int y ) { return ( x >= 0 && x < WIDTH ) && ( y >= 0 && y < HEIGHT ); }
 
 void PowderGame::takeUserInput()
 {
@@ -102,13 +94,15 @@ void PowderGame::takeUserInput()
   }
   if( GetMouseWheel() > 0 )
   {
-    selectedPowderIndex = ( selectedPowderIndex + 1 ) % powderTypes.size();
-  }    // Scroll up to increment selected powder
+    // Scroll up to increment selected powder
+    selectedPowderIndex = selectedPowderIndex + 1;
+  }
   if( GetMouseWheel() < 0 )
   {
-    selectedPowderIndex =
-        ( powderTypes.size() + ( ( selectedPowderIndex - 1 ) % powderTypes.size() ) ) % powderTypes.size();
-  }    // Scroll down to decrement selected powder
+    // Scroll down to decrement selected powder
+    selectedPowderIndex = selectedPowderIndex - 1;
+  }
+  selectedPowderIndex = ( ( selectedPowderIndex % num_powders ) + num_powders ) % num_powders;
 }
 
 void PowderGame::fillPowderCircle( int x, int y, std::string type, int scale, bool replace )
@@ -116,7 +110,7 @@ void PowderGame::fillPowderCircle( int x, int y, std::string type, int scale, bo
   scale--;
   for( int i = -scale; i <= scale; i++ )
     for( int j = -scale; j <= scale; j++ )
-      if( InRange( i + x, j + y ) && i * i + j * j <= scale * scale )
+      if( inRange( i + x, j + y ) && i * i + j * j <= scale * scale )
       {
         if( replace || dynamic_cast<EmptyCell *>( elements[( j + y ) * WIDTH + ( i + x )] ) )
         {
@@ -148,7 +142,7 @@ void PowderGame::drawScreen()
 
   for( int i = -scale; i <= scale; i++ )
     for( int j = -scale; j <= scale; j++ )
-      if( InRange( i + x, j + y ) && i * i + j * j <= scale * scale )
+      if( inRangeScreen( i + x, j + y ) && i * i + j * j <= scale * scale )
         FillRect( { ( i + x ) * powderSize, ( j + y ) * powderSize }, { powderSize, powderSize }, olc::CYAN );
 
   // Draw in powders

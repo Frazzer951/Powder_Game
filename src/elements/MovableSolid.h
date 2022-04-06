@@ -18,7 +18,7 @@ public:
     // First try to fall down
     int new_x = x;
     int new_y = y + 1;
-    if( pge->InRange( new_x, new_y )
+    if( pge->inRange( new_x, new_y )
         && ( dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) )
              || dynamic_cast<Liquid *>( pge->GetElementAt( new_x, new_y ) ) ) )
     {
@@ -31,14 +31,14 @@ public:
 
       // Try to move diagonally
       new_x = x + ( ( dir == 0 ) ? 1 : -1 );
-      if( pge->InRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
+      if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
       {
         pge->swap( x, y, new_x, new_y );
       }
       else    // Try other direction
       {
         new_x = x + ( ( dir == 1 ) ? 1 : -1 );
-        if( pge->InRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
+        if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
         {
           pge->swap( x, y, new_x, new_y );
         }

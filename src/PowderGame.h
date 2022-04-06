@@ -14,8 +14,9 @@ class PowderGame : public olc::PixelGameEngine
 private:
   std::unique_ptr<Element *[]> elements;
   std::vector<std::string>     powderTypes;
-  int                          WIDTH;                      // Game World Width
-  int                          HEIGHT;                     // Game World Height
+  int                          WIDTH;     // Game World Width
+  int                          HEIGHT;    // Game World Height
+  int                          num_powders;
   int                          powderSize          = 4;    // Size of a single Powder
   int                          selectedPowderIndex = 0;
   unsigned int                 BrushScale          = 1;
@@ -35,7 +36,6 @@ public:
 
   bool      OnUserCreate() override;
   bool      OnUserUpdate( float fElapsedTime ) override;
-  bool      InRange( int x, int y );
   void      swap( int x0, int y0, int x1, int y1 );
   void      takeUserInput();
   void      drawScreen();
@@ -45,6 +45,12 @@ public:
   int       rand2() { return std::rand() % 2; }
   void      PowderGame::fillPowderCircle( int x, int y, std::string type, int scale, bool replace );
   bool      isUpdated() const { return updated; }
+
+  bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
+  bool inRangeScreen( int x, int y )
+  {
+    return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() );
+  }
 };
 
 
