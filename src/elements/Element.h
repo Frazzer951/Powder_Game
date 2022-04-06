@@ -11,6 +11,11 @@ public:
   Element( int x, int y ) : x( x ), y( y ) {}
   virtual void update( PowderGame * pge ) = 0;
   virtual void draw( PowderGame * pge )   = 0;
+  void         setPosition( int new_x, int new_y )
+  {
+    x = new_x;
+    y = new_y;
+  }
 
 protected:
   int        x;

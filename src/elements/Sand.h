@@ -10,7 +10,16 @@ class Sand : public Solid
 {
 public:
   Sand( int x, int y ) : Solid( x, y ) { c = olc::Pixel( 194, 178, 128 ); }
-  void update( PowderGame * pge ) override {}
+  void update( PowderGame * pge ) override
+  {
+    // First try to fall down
+    int new_x = x;
+    int new_y = y + 1;
+    if( pge->InRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
+    {
+      pge->swap( x, y, new_x, new_y );
+    }
+  }
   void draw( PowderGame * pge ) override { pge->Draw( x, y, c ); }
 };
 
