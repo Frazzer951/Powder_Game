@@ -1,10 +1,9 @@
+#ifndef POWDERGAME_SAND_H
+#define POWDERGAME_SAND_H
+
 #include "PowderGame.h"
 
 #include "elements/Solid.h"
-
-#ifndef POWDERGAME_SAND_H
-#  define POWDERGAME_SAND_H
-
 
 class Sand : public Solid
 {

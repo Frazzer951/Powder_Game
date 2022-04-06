@@ -1,8 +1,7 @@
-#include "Element.h"
-
 #ifndef POWDERGAME_SOLID_H
-#  define POWDERGAME_SOLID_H
+#define POWDERGAME_SOLID_H
 
+#include "Element.h"
 
 class Solid : public Element
 {

@@ -1,9 +1,8 @@
+#ifndef POWDERGAME_AIR_H
+#define POWDERGAME_AIR_H
+
 #include "Gas.h"
 #include "PowderGame.h"
-
-#ifndef POWDERGAME_AIR_H
-#  define POWDERGAME_AIR_H
-
 
 class Air : public Gas
 {

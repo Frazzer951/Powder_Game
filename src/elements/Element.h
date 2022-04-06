@@ -1,7 +1,7 @@
-#include "olcPixelGameEngine/olcPixelGameEngine.h"
-
 #ifndef POWDERGAME_ELEMENT_H
-#  define POWDERGAME_ELEMENT_H
+#define POWDERGAME_ELEMENT_H
+
+#include "olcPixelGameEngine/olcPixelGameEngine.h"
 
 class PowderGame;
 
