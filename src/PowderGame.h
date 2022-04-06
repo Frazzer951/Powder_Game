@@ -25,9 +25,9 @@ private:
   int                          iTargetFPS;
   float                        fTargetFrameTime;
   float                        fAccumulatedTime = 0.0f;
-  bool                         simulate;
+  bool                         simulate         = false;
   bool                         updated;
-  const vec2f                  gravity = vec2f( 0.0f, -5.0f );
+  vec2f                        gravity = vec2f( 0.0f, -5.0f );
 
 public:
   PowderGame()
@@ -49,6 +49,10 @@ public:
   int       rand( int from, int to ) { return std::rand() % ( to - from ) + from; }
   void      PowderGame::fillPowderCircle( int x, int y, std::string type, int scale, bool replace );
   bool      isUpdated() const { return updated; }
+  bool      isEmpty( int x, int y );
+  bool      isLiquid( int x, int y );
+  bool      isSolid( int x, int y );
+  bool      isGas( int x, int y );
 
   bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
   bool inRangeScreen( int x, int y )

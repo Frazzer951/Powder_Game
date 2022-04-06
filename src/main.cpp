@@ -5,6 +5,9 @@
 #include "elements/Sand.h"
 #include "elements/Stone.h"
 #include "elements/Water.h"
+#include "elements/Liquid.h"
+#include "elements/Solid.h"
+#include "elements/Gas.h"
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
@@ -51,7 +54,7 @@ bool PowderGame::OnUserUpdate( float fElapsedTime )
     // Update all elements
     for( int y = HEIGHT - 1; y >= 0; y-- )
     {
-      for( int x = WIDTH - 1; x >= 0; x-- ) { elements[y * WIDTH + x]->update( this ); }
+      for( int x = WIDTH - 1; x >= 0; x-- ) { elements[y * WIDTH + x]->update( this, fElapsedTime ); }
     }
   }
   updated = !updated;
@@ -172,6 +175,10 @@ void PowderGame::DrawElement( int x, int y, olc::Pixel c )
 {
   FillRect( { x * powderSize, y * powderSize }, { powderSize, powderSize }, c );
 }
+bool PowderGame::isEmpty( int x, int y ) { return dynamic_cast<EmptyCell *>( GetElementAt( x, y ) ) != nullptr; }
+bool PowderGame::isLiquid( int x, int y ) { return dynamic_cast<Liquid *>( GetElementAt( x, y ) ) != nullptr; }
+bool PowderGame::isSolid( int x, int y ) { return dynamic_cast<Solid *>( GetElementAt( x, y ) ) != nullptr; }
+bool PowderGame::isGas( int x, int y ) { return dynamic_cast<Gas *>( GetElementAt( x, y ) ) != nullptr; }
 
 int main()
 {
