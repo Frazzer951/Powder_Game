@@ -14,7 +14,7 @@ file(GLOB src_files
         "src/*.h"
 )
 
-file(GLOB include_files
+file(GLOB_RECURSE include_files
         "include/*.cpp"
         "include/*.hpp"
         "include/*.h"
@@ -26,8 +26,8 @@ file(GLOB_RECURSE extern_files
         "external/*.h"
 )
 
-# message("Src: ${src_files}")
-# message("Elements: ${include_files}")
-# message("Extern: ${extern_files}")
+message("Src: ${src_files}")
+message("Include: ${include_files}")
+message("Extern: ${extern_files}")
 
 add_executable(${PROJECT_NAME} src/main.cpp ${src_files} ${include_files} ${extern_files})

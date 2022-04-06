@@ -8,7 +8,7 @@ class Solid : public Element
 {
 public:
   Solid( int x, int y ) : Element( x, y ) {}
-  void draw( PowderGame * pge ) override { pge->DrawElement( x, y, c ); }
+  void draw( PowderGame * pge ) override { pge->DrawElement( pos.x, pos.y, c ); }
 };
 
 

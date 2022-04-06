@@ -14,7 +14,12 @@ public:
     if( updated == pge->isUpdated() ) { return; }
     updated = !updated;
   }
-  void draw( PowderGame * pge ) override { pge->DrawElement( x, y, c ); }
+  void draw( PowderGame * pge ) override { pge->DrawElement( pos.x, pos.y, c ); }
+  bool actOnNeighboringElement( Element * neighbor, int modifiedMatrixX, int modifiedMatrixY, boolean isFinal,
+                                boolean isFirst, vec2i lastValidLocation, int depth ) override
+  {
+    return true;
+  }
 };
 
 

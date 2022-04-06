@@ -5,6 +5,8 @@
 #include <string>
 #include <vector>
 
+#include "vec2.h"
+
 #include "elements/Element.h"
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
@@ -25,7 +27,7 @@ private:
   float                        fAccumulatedTime = 0.0f;
   bool                         simulate;
   bool                         updated;
-
+  const vec2f                  gravity = vec2f( 0.0f, -5.0f );
 
 public:
   PowderGame()
@@ -37,6 +39,7 @@ public:
   bool      OnUserCreate() override;
   bool      OnUserUpdate( float fElapsedTime ) override;
   void      swap( int x0, int y0, int x1, int y1 );
+  void      swap( vec2i pos0, vec2i pos1 );
   void      takeUserInput();
   void      drawScreen();
   void      DrawElement( int x, int y, olc::Pixel c );
@@ -52,6 +55,7 @@ public:
   {
     return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() );
   }
+  const vec2f & getGravity() const { return gravity; }
 };
 
 

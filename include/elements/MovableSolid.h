@@ -9,41 +9,21 @@ class MovableSolid : public Solid
 {
 public:
   MovableSolid( int x, int y ) : Solid( x, y ) {}
+
   void update( PowderGame * pge ) override
   {
     // Only update once per cycle
     if( updated == pge->isUpdated() ) { return; }
     updated = !updated;
 
-    // First try to fall down
-    int new_x = x;
-    int new_y = y + 1;
-    if( pge->inRange( new_x, new_y )
-        && ( dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) )
-             || dynamic_cast<Liquid *>( pge->GetElementAt( new_x, new_y ) ) ) )
-    {
-      pge->swap( x, y, new_x, new_y );
-    }
-    else
-    {
-      // Pick random Direction
-      int dir = pge->rand2();
+    vel.y += pge->getGravity().y;
+    if( freeFalling ) { vel.x *= 0.9; }
+  }
 
-      // Try to move diagonally
-      new_x = x + ( ( dir == 0 ) ? 1 : -1 );
-      if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
-      {
-        pge->swap( x, y, new_x, new_y );
-      }
-      else    // Try other direction
-      {
-        new_x = x + ( ( dir == 1 ) ? 1 : -1 );
-        if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
-        {
-          pge->swap( x, y, new_x, new_y );
-        }
-      }
-    }
+  bool actOnNeighboringElement( Element * neighbor, int x, int y, bool isFinal, bool isFirst, vec2i lastValid,
+                                int depth ) override
+  {
+    return true;
   }
 };
 

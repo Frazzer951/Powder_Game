@@ -70,6 +70,8 @@ void PowderGame::swap( int x0, int y0, int x1, int y1 )
   elements[y1 * WIDTH + x1]->setPosition( x1, y1 );
 }
 
+void PowderGame::swap( vec2i pos0, vec2i pos1 ) { swap( pos0.x, pos0.y, pos1.x, pos1.y ); }
+
 Element * PowderGame::GetElementAt( int x, int y ) { return elements[y * WIDTH + x]; }
 
 void PowderGame::takeUserInput()
