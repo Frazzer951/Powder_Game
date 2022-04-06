@@ -23,6 +23,10 @@ protected:
   int        y;
   bool       updated;
   olc::Pixel c;
+
+public:
+  bool freeFalling = true;
+
 };
 
 
