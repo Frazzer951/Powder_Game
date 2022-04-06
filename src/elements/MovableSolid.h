@@ -1,6 +1,7 @@
 #ifndef POWDERGAME_MOVABLESOLID_H
 #define POWDERGAME_MOVABLESOLID_H
 
+#include "Liquid.h"
 #include "PowderGame.h"
 #include "Solid.h"
 
@@ -17,7 +18,9 @@ public:
     // First try to fall down
     int new_x = x;
     int new_y = y + 1;
-    if( pge->InRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
+    if( pge->InRange( new_x, new_y )
+        && ( dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) )
+             || dynamic_cast<Liquid *>( pge->GetElementAt( new_x, new_y ) ) ) )
     {
       pge->swap( x, y, new_x, new_y );
     }
