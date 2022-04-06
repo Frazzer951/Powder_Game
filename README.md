@@ -4,7 +4,8 @@
 
 ## Resources
 
-https://www.youtube.com/watch?v=5Ka3tbbT-9E&ab_channel=MARF
+https://www.youtube.com/watch?v=5Ka3tbbT-9E
+https://gist.github.com/DavidMcLaughlin208/60e69e698e3858617c322d80a8f174e2
 
 ## Keybindings
 

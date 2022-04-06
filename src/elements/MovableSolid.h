@@ -10,6 +10,10 @@ public:
   MovableSolid( int x, int y ) : Solid( x, y ) {}
   void update( PowderGame * pge ) override
   {
+    // Only update once per cycle
+    if( updated == pge->isUpdated() ) { return; }
+    updated = !updated;
+
     // First try to fall down
     int new_x = x;
     int new_y = y + 1;

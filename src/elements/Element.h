@@ -20,6 +20,7 @@ public:
 protected:
   int        x;
   int        y;
+  bool       updated;
   olc::Pixel c;
 };
 
