@@ -43,6 +43,7 @@ public:
   Element * GetElementAt( int x, int y );
   Element * CreateElement( std::string element_name );
   int       rand2() { return std::rand() % 2; }
+  int       rand( int from, int to ) { return std::rand() % ( to - from ) + from; }
   void      PowderGame::fillPowderCircle( int x, int y, std::string type, int scale, bool replace );
   bool      isUpdated() const { return updated; }
 

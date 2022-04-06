@@ -16,6 +16,7 @@ public:
     x = new_x;
     y = new_y;
   }
+  int rand( int from, int to ) { return std::rand() % ( to - from ) + from; }
 
 protected:
   int        x;

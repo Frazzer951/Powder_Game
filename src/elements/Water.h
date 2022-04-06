@@ -6,7 +6,7 @@
 class Water : public Liquid
 {
 public:
-  Water( int x, int y ) : Liquid( x, y ) { c = olc::Pixel( 0, 0, 255 ); }
+  Water( int x, int y ) : Liquid( x, y ) { c = olc::Pixel( 15, 94, 156 ); }
 };
 
 
