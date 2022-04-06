@@ -8,7 +8,7 @@ include_directories(src)
 include_directories(external)
 include_directories(include)
 
-file(GLOB src_files
+file(GLOB_RECURSE src_files
         "src/*.cpp"
         "src/*.hpp"
         "src/*.h"
