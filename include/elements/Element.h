@@ -12,10 +12,10 @@ class Element
 public:
   Element( int x, int y ) : pos( { x, y } ) {}
   Element( vec2i pos ) : pos( pos ) {}
-  virtual void update( PowderGame * pge )           = 0;
-  virtual void draw( PowderGame * pge )             = 0;
-  virtual bool actOnNeighboringElement( Element * neighbor, int x, int y, bool isFinal, bool isFirst, vec2i lastValid,
-                                        int depth ) = 0;
+  virtual void update( PowderGame * pge, float fElapsedTime ) = 0;
+  virtual void draw( PowderGame * pge )                       = 0;
+  virtual bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
+                                        vec2i lastValid, int depth ) = 0;
 
   bool actOnOther( Element * other );
   void moveToLastValid( PowderGame * pge, vec2i moveToLocation );
@@ -30,7 +30,9 @@ protected:
 
 public:
   bool  freeFalling = true;
-  vec2i vel;
+  vec2i vel         = vec2i( 0, 0 );
+  float xThreshold  = 0;
+  float yThreshold  = 0;
 };
 
 

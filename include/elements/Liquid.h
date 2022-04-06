@@ -8,7 +8,7 @@ class Liquid : public Element
 {
 public:
   Liquid( int x, int y ) : Element( x, y ) {}
-  void update( PowderGame * pge ) override
+  void update( PowderGame * pge, float fElapsedTime ) override
   {
     // Only update once per cycle
     if( updated == pge->isUpdated() ) { return; }
@@ -66,8 +66,8 @@ public:
     }
   }
   void draw( PowderGame * pge ) override { pge->DrawElement( pos.x, pos.y, c ); }
-  bool actOnNeighboringElement( Element * neighbor, int x, int y, bool isFinal, bool isFirst, vec2i lastValid,
-                                int depth ) override
+  bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
+                                vec2i lastValid, int depth ) override
   {
     return true;
   }

@@ -8,9 +8,9 @@ class ImmovableSolid : public Solid
 {
 public:
   ImmovableSolid( int x, int y ) : Solid( x, y ) {}
-  void update( PowderGame * pge ) override {}
-  bool actOnNeighboringElement( Element * neighbor, int x, int y, bool isFinal, bool isFirst, vec2i lastValid,
-                                int depth ) override
+  void update( PowderGame * pge, float fElapsedTime ) override {}
+  bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
+                                vec2i lastValid, int depth ) override
   {
     return true;
   }
