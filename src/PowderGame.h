@@ -27,7 +27,7 @@ private:
   float                        fAccumulatedTime = 0.0f;
   bool                         simulate         = false;
   bool                         updated;
-  vec2f                        gravity = vec2f( 0.0f, -5.0f );
+  vec2f                        gravity = vec2f( 0.0f, 5.0f );
 
 public:
   PowderGame()
@@ -53,6 +53,12 @@ public:
   bool      isLiquid( int x, int y );
   bool      isSolid( int x, int y );
   bool      isGas( int x, int y );
+  bool      isEmpty( vec2i pos ) { return isEmpty( pos.x, pos.y ); }
+  bool      isLiquid( vec2i pos ) { return isLiquid( pos.x, pos.y ); }
+  bool      isSolid( vec2i pos ) { return isSolid( pos.x, pos.y ); }
+  bool      isGas( vec2i pos ) { return isGas( pos.x, pos.y ); }
+  void      setElementAt( int x, int y, Element * element );
+  void      setElementAt( vec2i pos, Element * element ) { setElementAt( pos.x, pos.y, element ); }
 
   bool inRange( int x, int y ) { return ( x >= 0 ) && ( x < WIDTH ) && ( y >= 0 ) && ( y < HEIGHT ); }
   bool inRangeScreen( int x, int y )

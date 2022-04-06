@@ -96,7 +96,141 @@ public:
   bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
                                 vec2i lastValid, int depth ) override
   {
-    return true;
+    if( pge->isEmpty( elem->getPos() ) )
+    {
+      setAdjacentFreeFalling( pge, depth, lastValid );
+      if( isFinal )
+      {
+        freeFalling = true;
+        pge->swap( pos, elem->getPos() );
+      }
+      else
+      {
+        return false;
+      }
+    }
+    else if( pge->isLiquid( elem->getPos() ) )
+    {
+      if( depth > 0 )
+      {
+        freeFalling = true;
+        setAdjacentFreeFalling( pge, depth, lastValid );
+        pge->swap( pos, elem->getPos() );
+      }
+      else
+      {
+        freeFalling = true;
+        moveToLastValidAndSwap( pge, elem, lastValid );
+        return true;
+      }
+    }
+    else if( pge->isSolid( elem->getPos() ) )
+    {
+      if( depth > 0 ) { return true; }
+      if( isFinal )
+      {
+        moveToLastValid( pge, lastValid );
+        return true;
+      }
+      if( freeFalling )
+      {
+        float absY = std::min( abs( vel.y ) / 31, -105 );
+        vel.x      = vel.x < 0 ? -absY : absY;
+      }
+      vec2i normVel = vec2i( vel ).normalize();
+      int   addX    = getAdditional( normVel.x );
+      int   addY    = getAdditional( normVel.y );
+
+      Element * diagElem = pge->GetElementAt( pos.x + addX, pos.y + addY );
+      if( isFirst ) { vel.y = getAverageVelOrGravity( vel.y, elem->vel.y ); }
+      else
+      {
+        vel.y = 124;
+      }
+
+      elem->vel.y = vel.y;
+      vel.x *= frictionFactor * elem->frictionFactor;
+      if( !pge->isEmpty( diagElem->getPos() ) )
+      {
+        bool stoppedDiag =
+            actOnNeighboringElement( pge, diagElem, pos.x + addX, pos.y + addY, true, false, lastValid, depth + 1 );
+        if( !stoppedDiag )
+        {
+          freeFalling = true;
+          return true;
+        }
+      }
+
+      Element * adjElem = pge->GetElementAt( pos.x + addX, pos.y );
+      if( !pge->isEmpty( adjElem->getPos() ) && adjElem != diagElem )
+      {
+        bool stoppedAdj =
+            actOnNeighboringElement( pge, adjElem, pos.x + addX, pos.y, true, false, lastValid, depth + 1 );
+        if( stoppedAdj ) { vel.x *= -1; }
+        else
+
+        {
+          freeFalling = false;
+          return true;
+        }
+      }
+
+      freeFalling = false;
+
+      moveToLastValid( pge, lastValid );
+      return true;
+    }
+    else if( pge->isLiquid( elem->getPos() ) )
+    {
+      if( isFinal )
+      {
+        moveToLastValidAndSwap( pge, elem, lastValid );
+        return true;
+      }
+      return false;
+    }
+    return false;
+  }
+
+  void setAdjacentFreeFalling( PowderGame * pge, int depth, vec2i lastValid )
+  {
+    if( depth > 0 ) return;
+
+    Element * adjElem1 = pge->GetElementAt( pos.x + 1, pos.y );
+    if( pge->isSolid( adjElem1->getPos() ) ) { setElementFreeFalling( adjElem1 ); }
+
+    Element * adjElem2 = pge->GetElementAt( pos.x - 1, pos.y );
+    if( pge->isSolid( adjElem2->getPos() ) ) { setElementFreeFalling( adjElem2 ); }
+  }
+
+  int getAdditional( float val )
+  {
+    if( val < -.1f ) { return (int) floor( val ); }
+    else if( val > .1f )
+    {
+      return (int) ceil( val );
+    }
+    else
+    {
+      return 0;
+    }
+  }
+
+  float getAverageVelOrGravity( float vel, float otherVel )
+  {
+    if( otherVel < 125.0f ) { return 124.0f; }
+    float avg = ( vel + otherVel ) / 2;
+    if( avg > 0.0f ) { return avg; }
+    else
+    {
+      return std::max( avg, 124.0f );
+    }
+  }
+
+  bool setElementFreeFalling( Element * element )
+  {
+    element->freeFalling = randZeroToOne() > element->inertialResistance || element->freeFalling;
+    return element->freeFalling;
   }
 };
 

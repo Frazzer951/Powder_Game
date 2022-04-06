@@ -2,12 +2,12 @@
 
 #include "elements/Element.h"
 #include "elements/EmptyCell.h"
+#include "elements/Gas.h"
+#include "elements/Liquid.h"
 #include "elements/Sand.h"
+#include "elements/Solid.h"
 #include "elements/Stone.h"
 #include "elements/Water.h"
-#include "elements/Liquid.h"
-#include "elements/Solid.h"
-#include "elements/Gas.h"
 
 #include "olcPixelGameEngine/olcPixelGameEngine.h"
 
@@ -179,6 +179,11 @@ bool PowderGame::isEmpty( int x, int y ) { return dynamic_cast<EmptyCell *>( Get
 bool PowderGame::isLiquid( int x, int y ) { return dynamic_cast<Liquid *>( GetElementAt( x, y ) ) != nullptr; }
 bool PowderGame::isSolid( int x, int y ) { return dynamic_cast<Solid *>( GetElementAt( x, y ) ) != nullptr; }
 bool PowderGame::isGas( int x, int y ) { return dynamic_cast<Gas *>( GetElementAt( x, y ) ) != nullptr; }
+void PowderGame::setElementAt( int x, int y, Element * element )
+{
+  elements[y * WIDTH + x] = element;
+  elements[y * WIDTH + x]->setPosition( x, y );
+}
 
 int main()
 {
