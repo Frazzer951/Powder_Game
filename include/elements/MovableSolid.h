@@ -8,6 +8,9 @@
 class MovableSolid : public Solid
 {
 public:
+  float Y_Conversion_Rate = 1.0f;
+  float Max_Bounce        = 100.0f;
+
   MovableSolid( int x, int y ) : Solid( x, y ) {}
 
   void update( PowderGame * pge, float fElapsedTime ) override
@@ -16,55 +19,27 @@ public:
     if( updated == pge->isUpdated() ) { return; }
     updated = !updated;
 
-    vel.x += pge->getGravity().x;
-    vel.y += pge->getGravity().y;
+    vel += pge->getGravity();
     if( freeFalling ) { vel.x *= 0.9; }
 
-    int   yModifier       = vel.y < 0 ? -1 : 1;
-    int   xModifier       = vel.x < 0 ? -1 : 1;
-    float velXDeltaTime_F = abs( vel.x ) * fElapsedTime;
-    float velYDeltaTIme_F = abs( vel.y ) * fElapsedTime;
-    int   velXDeltaTime;
-    int   velYDeltaTime;
+    vel.clamp( -200, 200 );
 
-    // Calculate velXDeltaTime
-    if( velXDeltaTime_F < 0 )
-    {
-      xThreshold += velXDeltaTime_F;
-      velXDeltaTime = (int) xThreshold;
-      if( abs( velXDeltaTime ) > 0 ) { xThreshold = 0; }
-    }
-    else
-    {
-      xThreshold    = 0;
-      velXDeltaTime = (int) velXDeltaTime_F;
-    }
-
-    // Calculate velYDeltaTime
-    if( velYDeltaTIme_F < 0 )
-    {
-      yThreshold += velYDeltaTIme_F;
-      velYDeltaTime = (int) yThreshold;
-      if( abs( velYDeltaTime ) > 0 ) { yThreshold = 0; }
-    }
-    else
-    {
-      yThreshold    = 0;
-      velYDeltaTime = (int) velYDeltaTIme_F;
-    }
-
-    bool xDiffIsLarger = abs( velXDeltaTime ) > abs( velYDeltaTime );
+    int   yModifier     = vel.y < 0 ? -1 : 1;
+    int   xModifier     = vel.x < 0 ? -1 : 1;
+    float velXDeltaTime = abs( vel.x ) * fElapsedTime;
+    float velYDeltaTime = abs( vel.y ) * fElapsedTime;
+    bool  xDiffIsLarger = abs( velXDeltaTime ) > abs( velYDeltaTime );
 
     int   upperBound = std::max( abs( velXDeltaTime ), abs( velYDeltaTime ) );
     int   min        = std::min( abs( velXDeltaTime ), abs( velYDeltaTime ) );
-    float slope      = ( min == 0 || upperBound == 0 ) ? 0 : ( (float) ( min + 1 ) / ( upperBound + 1 ) );
+    float slope      = ( min == 0 || upperBound == 0 ) ? 0 : ( (float) ( min ) / ( upperBound ) );
 
     int   smallerCount;
     vec2i formerPos = vec2i( pos );
     vec2i lastValid = vec2i( pos );
-    for( int i = 0; i <= upperBound; i++ )
+    for( int i = 1; i <= upperBound; i++ )
     {
-      smallerCount = floor( i * slope );
+      smallerCount = round( i * slope );
       int yIncrease, xIncrease;
       if( xDiffIsLarger )
       {
@@ -109,24 +84,8 @@ public:
         return false;
       }
     }
-    else if( pge->isLiquid( elem->getPos() ) )
-    {
-      if( depth > 0 )
-      {
-        freeFalling = true;
-        setAdjacentFreeFalling( pge, depth, lastValid );
-        pge->swap( pos, elem->getPos() );
-      }
-      else
-      {
-        freeFalling = true;
-        moveToLastValidAndSwap( pge, elem, lastValid );
-        return true;
-      }
-    }
     else if( pge->isSolid( elem->getPos() ) )
     {
-      if( depth > 0 ) { return true; }
       if( isFinal )
       {
         moveToLastValid( pge, lastValid );
@@ -134,53 +93,21 @@ public:
       }
       if( freeFalling )
       {
-        float absY = std::min( abs( vel.y ) / 31, -105 );
-        vel.x      = vel.x < 0 ? -absY : absY;
-      }
-      vec2i normVel = vec2i( vel ).normalize();
-      int   addX    = getAdditional( normVel.x );
-      int   addY    = getAdditional( normVel.y );
-
-      Element * diagElem = pge->GetElementAt( pos.x + addX, pos.y + addY );
-      if( isFirst ) { vel.y = getAverageVelOrGravity( vel.y, elem->vel.y ); }
-      else
-      {
-        vel.y = 124;
+        // Convert part of y-vel to x-vel when hitting ground
+        float absY = abs( vel.y ) / Y_Conversion_Rate;
+        vel.x += ( randZeroToOne() < 0.5 ) ? -absY : absY;
       }
 
-      elem->vel.y = vel.y;
-      vel.x *= frictionFactor * elem->frictionFactor;
-      if( !pge->isEmpty( diagElem->getPos() ) )
-      {
-        bool stoppedDiag =
-            actOnNeighboringElement( pge, diagElem, pos.x + addX, pos.y + addY, true, false, lastValid, depth + 1 );
-        if( !stoppedDiag )
-        {
-          freeFalling = true;
-          return true;
-        }
-      }
+      // vec2f normVel = vec2f( vel ).normalize();
+      // int   addX    = getAdditional( normVel.x );
+      // int   addY    = getAdditional( normVel.y );
 
-      Element * adjElem = pge->GetElementAt( pos.x + addX, pos.y );
-      if( !pge->isEmpty( adjElem->getPos() ) && adjElem != diagElem )
-      {
-        bool stoppedAdj =
-            actOnNeighboringElement( pge, adjElem, pos.x + addX, pos.y, true, false, lastValid, depth + 1 );
-        if( stoppedAdj ) { vel.x *= -1; }
-        else
-
-        {
-          freeFalling = false;
-          return true;
-        }
-      }
 
       freeFalling = false;
-
       moveToLastValid( pge, lastValid );
       return true;
     }
-    else if( pge->isLiquid( elem->getPos() ) )
+    else if( pge->isGas( elem->getPos() ) )
     {
       if( isFinal )
       {
@@ -188,6 +115,11 @@ public:
         return true;
       }
       return false;
+    }
+    else if( pge->isLiquid( elem->getPos() ) )
+    {
+      moveToLastValidAndSwap( pge, elem, lastValid );
+      return true;
     }
     return false;
   }
@@ -229,7 +161,7 @@ public:
 
   bool setElementFreeFalling( Element * element )
   {
-    element->freeFalling = randZeroToOne() > element->inertialResistance || element->freeFalling;
+    element->freeFalling = ( randZeroToOne() >= element->inertialResistance ) || element->freeFalling;
     return element->freeFalling;
   }
 };

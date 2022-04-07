@@ -65,7 +65,7 @@ public:
   {
     return ( x >= 0 ) && ( x < ScreenWidth() ) && ( y >= 0 ) && ( y < ScreenHeight() );
   }
-  const vec2f & getGravity() const { return gravity; }
+  vec2f getGravity() { return gravity; }
 };
 
 

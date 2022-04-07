@@ -94,6 +94,15 @@ public:
     return *this;
   }
 
+  vec2 & clamp( T min, T max )
+  {
+    if( x < min ) x = min;
+    if( x > max ) x = max;
+    if( y < min ) y = min;
+    if( y > max ) y = max;
+    return *this;
+  }
+
   float dist( vec2 v ) const
   {
     vec2 d( v.x - x, v.y - y );

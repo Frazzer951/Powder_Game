@@ -18,7 +18,7 @@ public:
                                         vec2i lastValid, int depth ) = 0;
 
   bool          actOnOther( Element * other );
-  void          moveToLastValid( PowderGame * pge, vec2i moveToLocation );
+  void          moveToLastValid( PowderGame * pge, vec2i lastValid );
   void          moveToLastValidAndSwap( PowderGame * pge, Element * toSwap, vec2i moveToLocation );
   void          setPosition( vec2i new_pos );
   void          setPosition( int new_x, int new_y );
@@ -33,7 +33,7 @@ protected:
 
 public:
   bool  freeFalling        = true;
-  vec2i vel                = vec2i( 0, 0 );
+  vec2f vel                = vec2f( 0.0, 0.0 );
   float xThreshold         = 0;
   float yThreshold         = 0;
   float frictionFactor     = 1.0f;

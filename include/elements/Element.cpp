@@ -2,14 +2,15 @@
 #include "PowderGame.h"
 
 bool Element::actOnOther( Element * other ) { return false; }
-void Element::moveToLastValid( PowderGame * pge, vec2i moveToLocation )
+void Element::moveToLastValid( PowderGame * pge, vec2i lastValid )
 {
-  if( moveToLocation.x == pos.x && moveToLocation.y == pos.y ) return;
-  Element * toSwap = pge->GetElementAt( moveToLocation.x, moveToLocation.y );
-  pge->swap( toSwap->pos, moveToLocation );
+  if( lastValid.x == pos.x && lastValid.y == pos.y ) return;
+  pge->swap( pos, lastValid );
 }
 void Element::moveToLastValidAndSwap( PowderGame * pge, Element * toSwap, vec2i moveToLocation )
 {
+  // TODO: Redo this function
+  // First goto last valid, then swap with toSwap
   int       x     = moveToLocation.x;
   int       y     = moveToLocation.y;
   Element * third = pge->GetElementAt( x, y );
