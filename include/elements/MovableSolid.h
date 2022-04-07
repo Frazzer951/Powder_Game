@@ -19,54 +19,31 @@ public:
     if( updated == pge->isUpdated() ) { return; }
     updated = !updated;
 
-    vel += pge->getGravity();
-    if( freeFalling ) { vel.x *= 0.9; }
-
-    vel.clamp( -200, 200 );
-
-    int   yModifier     = vel.y < 0 ? -1 : 1;
-    int   xModifier     = vel.x < 0 ? -1 : 1;
-    float velXDeltaTime = abs( vel.x ) * fElapsedTime;
-    float velYDeltaTime = abs( vel.y ) * fElapsedTime;
-    bool  xDiffIsLarger = abs( velXDeltaTime ) > abs( velYDeltaTime );
-
-    int   upperBound = std::max( abs( velXDeltaTime ), abs( velYDeltaTime ) );
-    int   min        = std::min( abs( velXDeltaTime ), abs( velYDeltaTime ) );
-    float slope      = ( min == 0 || upperBound == 0 ) ? 0 : ( (float) ( min ) / ( upperBound ) );
-
-    int   smallerCount;
-    vec2i formerPos = vec2i( pos );
-    vec2i lastValid = vec2i( pos );
-    for( int i = 1; i <= upperBound; i++ )
+    // Check below
+    if( !tryMove( pge, pos.x, pos.y + 1 ) )
     {
-      smallerCount = round( i * slope );
-      int yIncrease, xIncrease;
-      if( xDiffIsLarger )
-      {
-        xIncrease = i;
-        yIncrease = smallerCount;
-      }
+      // Check diagonal
+      if( randZeroToOne() < 0.5 ) { tryMove( pge, pos.x + 1, pos.y + 1 ); }
       else
       {
-        xIncrease = smallerCount;
-        yIncrease = i;
-      }
-      int new_x = pos.x + ( xIncrease * xModifier );
-      int new_y = pos.y + ( yIncrease * yModifier );
-      if( pge->inRange( new_x, new_y ) )
-      {
-        Element * neighbor = pge->GetElementAt( new_x, new_y );
-        if( neighbor == this ) continue;
-        bool stopped = actOnNeighboringElement( pge, neighbor, new_x, new_y, i == upperBound, i == 1, lastValid, 0 );
-        if( stopped ) { break; }
-        lastValid = vec2i( new_x, new_y );
-      }
-      else
-      {
-        pge->swap( pos, lastValid );
+        tryMove( pge, pos.x - 1, pos.y + 1 );
       }
     }
   }
+
+  bool tryMove( PowderGame * pge, int x, int y )
+  {
+    if( pge->inRange( x, y ) )
+    {
+      if( pge->isEmpty( x, y ) || pge->isLiquid( x, y ) || pge->isGas( x, y ) )
+      {
+        pge->swap( pos.x, pos.y, x, y );
+        return true;
+      }
+    }
+    return false;
+  }
+
 
   bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
                                 vec2i lastValid, int depth ) override

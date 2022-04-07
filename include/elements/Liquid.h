@@ -14,56 +14,28 @@ public:
     if( updated == pge->isUpdated() ) { return; }
     updated = !updated;
 
-    // First try to fall down
-    int new_x = pos.x;
-    int new_y = pos.y + 1;
-    if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
+    // Check below
+    if( !tryMove( pge, pos.x, pos.y + 1 ) )
     {
-      pge->swap( pos.x, pos.y, new_x, new_y );
-    }
-    else
-    {
-      // Pick random Direction
-      int dir = pge->rand2();
-
-      // Try to move diagonally
-      new_x = pos.x + ( ( dir == 0 ) ? 1 : -1 );
-      if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
+      // Check diagonal
+      if( randZeroToOne() < 0.5 ) { tryMove( pge, pos.x + 1, pos.y ); }
+      else
       {
-        pge->swap( pos.x, pos.y, new_x, new_y );
-      }
-      else    // Try other direction
-      {
-        new_x = pos.x + ( ( dir == 1 ) ? 1 : -1 );
-        if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
-        {
-          pge->swap( pos.x, pos.y, new_x, new_y );
-        }
-        else
-        {
-          // Try left or right
-          // Pick random Direction
-          int dir = pge->rand2();
-
-          // Try to move diagonally
-          new_x = pos.x + ( ( dir == 0 ) ? 1 : -1 );
-          new_y = pos.y;
-
-          if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
-          {
-            pge->swap( pos.x, pos.y, new_x, new_y );
-          }
-          else    // Try other direction
-          {
-            new_x = pos.x + ( ( dir == 1 ) ? 1 : -1 );
-            if( pge->inRange( new_x, new_y ) && dynamic_cast<EmptyCell *>( pge->GetElementAt( new_x, new_y ) ) )
-            {
-              pge->swap( pos.x, pos.y, new_x, new_y );
-            }
-          }
-        }
+        tryMove( pge, pos.x - 1, pos.y );
       }
     }
+  }
+  bool tryMove( PowderGame * pge, int x, int y )
+  {
+    if( pge->inRange( x, y ) )
+    {
+      if( pge->isEmpty( x, y ) || pge->isGas( x, y ) )
+      {
+        pge->swap( pos.x, pos.y, x, y );
+        return true;
+      }
+    }
+    return false;
   }
   void draw( PowderGame * pge ) override { pge->DrawElement( pos.x, pos.y, c ); }
   bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
