@@ -38,11 +38,6 @@ public:
     return false;
   }
   void draw( PowderGame * pge ) override { pge->DrawElement( pos.x, pos.y, c ); }
-  bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
-                                vec2i lastValid, int depth ) override
-  {
-    return true;
-  }
 };
 
 

@@ -14,12 +14,7 @@ public:
   Element( vec2i pos ) : pos( pos ) {}
   virtual void update( PowderGame * pge, float fElapsedTime )        = 0;
   virtual void draw( PowderGame * pge )                              = 0;
-  virtual bool actOnNeighboringElement( PowderGame * pge, Element * elem, int x, int y, bool isFinal, bool isFirst,
-                                        vec2i lastValid, int depth ) = 0;
 
-  bool          actOnOther( Element * other );
-  void          moveToLastValid( PowderGame * pge, vec2i lastValid );
-  void          moveToLastValidAndSwap( PowderGame * pge, Element * toSwap, vec2i moveToLocation );
   void          setPosition( vec2i new_pos );
   void          setPosition( int new_x, int new_y );
   int           rand( int from, int to ) { return std::rand() % ( to - from ) + from; }
@@ -33,11 +28,6 @@ protected:
 
 public:
   bool  freeFalling        = true;
-  vec2f vel                = vec2f( 0.0, 0.0 );
-  float xThreshold         = 0;
-  float yThreshold         = 0;
-  float frictionFactor     = 1.0f;
-  float inertialResistance = 0.0f;
 };
 
 
