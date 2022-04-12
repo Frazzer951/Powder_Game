@@ -145,7 +145,7 @@ Element * PowderGame::CreateElement( std::string element_name )
 void PowderGame::drawScreen()
 {
   // Clear the screen
-  Clear( olc::BLACK );
+  Clear( olc::VERY_DARK_GREY );
 
   // Draw in brush outline
   int scale = BrushScale - 1;

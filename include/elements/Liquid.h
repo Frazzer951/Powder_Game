@@ -6,6 +6,9 @@
 
 class Liquid : public Element
 {
+private:
+  int dispersion_rate = 5;
+
 public:
   Liquid( int x, int y ) : Element( x, y ) {}
   void update( PowderGame * pge, float fElapsedTime ) override
@@ -17,11 +20,12 @@ public:
     // Check below
     if( !tryMove( pge, pos.x, pos.y + 1 ) )
     {
-      // Check diagonal
-      if( randZeroToOne() < 0.5 ) { tryMove( pge, pos.x + 1, pos.y ); }
-      else
+      // Check to side
+      vec2i i_pos = pos;
+      int dir = randZeroToOne() < 0.5 ? -1 : 1;
+      for( int i = 1; i <= dispersion_rate; i++ )
       {
-        tryMove( pge, pos.x - 1, pos.y );
+        if( tryMove( pge, i_pos.x + ( dir * dispersion_rate ), i_pos.y ) ) { break; }
       }
     }
   }

@@ -149,3 +149,4 @@ fabric.properties
 
 ### Custom ###
 .idea/
+*build*
